@@ -25,10 +25,10 @@
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior: none;
-            position: fixed;
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
         /* Utility Classes */
@@ -274,14 +274,16 @@
         #app-container {
             width: 100vw;
             height: 100vh;
-            overflow: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
         
         .scrollable-content {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            height: 100%;
+            flex: 1;
+            height: auto;
         }
         
         /* Loading state */
@@ -323,13 +325,15 @@
     <div id="root"></div>
 
     <script>
-        // Prevent default iOS behaviors
+        // Prevent default iOS behaviors - but allow scrolling
         document.addEventListener('touchstart', function(e) {
+            // Only prevent multi-touch (pinch zoom)
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
-        });
+        }, { passive: false });
 
+        // Prevent double-tap zoom only
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function(e) {
             const now = (new Date()).getTime();
@@ -337,17 +341,12 @@
                 e.preventDefault();
             }
             lastTouchEnd = now;
-        }, false);
+        }, { passive: false });
 
-        // Prevent zoom on double tap
-        let lastTap = 0;
+        // Remove the aggressive touch prevention - allow normal scrolling
+        // Only prevent zoom on double tap for specific elements
         document.addEventListener('touchstart', function(e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            if (tapLength < 500 && tapLength > 0) {
-                e.preventDefault();
-            }
-            lastTap = currentTime;
+            // Allow normal scrolling, only prevent zoom on double tap
         });
 
         // iOS Haptic Feedback
