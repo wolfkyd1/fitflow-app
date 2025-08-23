@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>FitFlow - Your Personal Workout Companion</title>
@@ -14,34 +14,47 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            overflow: hidden;
             position: relative;
         }
         
         .app-container {
-            height: 100vh;
-            height: 100dvh;
-            max-width: 430px;
-            margin: 0 auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
             flex-direction: column;
             background: #f9fafb;
-            position: relative;
+            max-width: 430px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
             box-shadow: 0 0 40px rgba(0,0,0,0.3);
         }
         
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: env(safe-area-inset-top, 20px) 20px 20px;
+            padding-top: env(safe-area-inset-top, 20px);
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 20px;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         .header::before {
@@ -80,18 +93,23 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
-            padding-bottom: env(safe-area-inset-bottom, 80px);
+            padding-bottom: 100px;
             scroll-behavior: smooth;
+            position: relative;
         }
         
         .nav {
             background: white;
             border-top: 1px solid #e5e7eb;
             display: flex;
-            padding: 8px 8px env(safe-area-inset-bottom, 8px);
+            padding-top: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 8px) + 8px);
             box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
             position: relative;
             z-index: 100;
+            flex-shrink: 0;
         }
         
         .nav-item {
@@ -206,6 +224,11 @@
         .btn-warning {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
         
         .stats-grid {
@@ -538,13 +561,21 @@
             padding: 16px;
             margin-bottom: 12px;
             border-radius: 12px;
+            position: relative;
         }
         
         .exercise-controls {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
             gap: 8px;
             margin-top: 12px;
+        }
+        
+        .exercise-control-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 4px;
+            font-weight: 600;
         }
         
         .weight-tracker {
@@ -581,6 +612,40 @@
             font-weight: bold;
         }
         
+        .progressive-overload-box {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .progressive-overload-box h4 {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .overload-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .overload-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .overload-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
         .rest-display {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
@@ -609,6 +674,17 @@
             margin-top: 20px;
         }
         
+        .weight-display {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
         /* Responsive Design */
         @media (max-width: 375px) {
             .header h1 { font-size: 24px; }
@@ -618,13 +694,16 @@
             .btn { padding: 12px 16px; font-size: 14px; }
             .nav-item { font-size: 10px; }
             .nav-item .icon { font-size: 18px; }
+            .exercise-controls { grid-template-columns: 1fr 1fr; }
         }
         
         @media (min-width: 430px) {
             .app-container {
                 border-radius: 20px;
                 margin: 20px auto;
-                height: calc(100vh - 40px);
+                height: calc(100% - 40px);
+                top: 20px;
+                bottom: 20px;
             }
         }
         
@@ -702,6 +781,11 @@
         };
         let userWeights = {};
         let exerciseHistory = {};
+        let progressiveOverload = {
+            enabled: false,
+            percentage: 5,
+            weeks: 2
+        };
 
         // Equipment and workout types
         const equipmentOptions = [
@@ -810,26 +894,26 @@
 
         // Exercise instructions
         const exerciseInstructions = {
-            'Push-ups': 'Start in plank position with hands shoulder-width apart. Lower your body until chest nearly touches the floor. Push back up to starting position.',
-            'Squats': 'Stand with feet shoulder-width apart. Lower your body by bending knees and pushing hips back. Keep chest up and knees behind toes. Return to standing.',
-            'Pull-ups': 'Hang from bar with overhand grip. Pull your body up until chin is over the bar. Lower back down with control.',
-            'Deadlifts': 'Stand with feet hip-width apart, barbell in front. Bend at hips and knees, grip bar. Lift by extending hips and knees simultaneously.',
-            'Plank': 'Start in push-up position on forearms. Keep body in straight line from head to heels. Hold position while breathing normally.',
-            'Lunges': 'Step forward with one leg, lowering hips until both knees are bent at 90 degrees. Push back to starting position.',
-            'Burpees': 'Start standing, drop to push-up position, do a push-up, jump feet to hands, then jump up with arms overhead.',
-            'Mountain Climbers': 'Start in plank position. Alternate bringing knees to chest in a running motion while keeping hips low.',
-            'Dumbbell Bench Press': 'Lie on bench with dumbbells at chest level. Press weights up until arms are extended. Lower with control.',
-            'Bent-over Rows': 'Hinge at hips with slight knee bend. Pull weight to lower chest, squeezing shoulder blades together.',
-            'Overhead Press': 'Stand with weights at shoulder height. Press overhead until arms are fully extended. Lower with control.',
-            'Bicep Curls': 'Stand with arms at sides holding weights. Curl weights toward shoulders, keeping elbows stationary.',
-            'Tricep Extensions': 'Hold weight overhead with both hands. Lower behind head by bending elbows. Extend back to start.',
-            'Russian Twists': 'Sit with knees bent, feet elevated. Lean back slightly and rotate torso side to side.',
-            'Jumping Jacks': 'Jump feet apart while raising arms overhead. Jump back to starting position.',
-            'Wall Sits': 'Stand with back against wall. Slide down until thighs are parallel to floor. Hold position.',
-            'Calf Raises': 'Stand on balls of feet. Rise up onto toes, then lower back down with control.',
-            'Hip Thrusts': 'Sit with upper back against bench, barbell on hips. Drive hips up, squeezing glutes at top.',
-            'Bulgarian Split Squats': 'Place rear foot on bench behind you. Lower into lunge position, then drive back up.',
-            'Default': 'Perform the exercise with proper form, focusing on controlled movements and full range of motion.'
+            'Push-ups': 'Start in plank position with hands shoulder-width apart. Lower your body until chest nearly touches the floor. Push back up to starting position. Keep core tight throughout.',
+            'Squats': 'Stand with feet shoulder-width apart. Lower your body by bending knees and pushing hips back. Keep chest up and knees behind toes. Drive through heels to return to standing.',
+            'Pull-ups': 'Hang from bar with overhand grip slightly wider than shoulders. Pull your body up until chin is over the bar. Lower back down with control. Keep core engaged.',
+            'Deadlifts': 'Stand with feet hip-width apart, barbell in front. Bend at hips and knees, grip bar. Lift by extending hips and knees simultaneously. Keep back straight throughout.',
+            'Plank': 'Start in push-up position on forearms. Keep body in straight line from head to heels. Hold position while breathing normally. Don\'t let hips sag.',
+            'Lunges': 'Step forward with one leg, lowering hips until both knees are bent at 90 degrees. Push back to starting position. Keep torso upright.',
+            'Burpees': 'Start standing, drop to push-up position, do a push-up, jump feet to hands, then jump up with arms overhead. Land softly and repeat.',
+            'Mountain Climbers': 'Start in plank position. Alternate bringing knees to chest in a running motion while keeping hips low and core tight.',
+            'Dumbbell Bench Press': 'Lie on bench with dumbbells at chest level. Press weights up until arms are extended. Lower with control. Keep feet flat on floor.',
+            'Bent-over Rows': 'Hinge at hips with slight knee bend. Pull weight to lower chest, squeezing shoulder blades together. Keep back straight.',
+            'Overhead Press': 'Stand with weights at shoulder height. Press overhead until arms are fully extended. Lower with control. Keep core engaged.',
+            'Bicep Curls': 'Stand with arms at sides holding weights. Curl weights toward shoulders, keeping elbows stationary. Lower with control.',
+            'Tricep Extensions': 'Hold weight overhead with both hands. Lower behind head by bending elbows. Extend back to start. Keep elbows pointing forward.',
+            'Russian Twists': 'Sit with knees bent, feet elevated. Lean back slightly and rotate torso side to side. Keep chest up and core engaged.',
+            'Jumping Jacks': 'Jump feet apart while raising arms overhead. Jump back to starting position. Land softly on balls of feet.',
+            'Wall Sits': 'Stand with back against wall. Slide down until thighs are parallel to floor. Hold position. Keep knees at 90 degrees.',
+            'Calf Raises': 'Stand on balls of feet. Rise up onto toes, then lower back down with control. Keep body straight throughout.',
+            'Hip Thrusts': 'Sit with upper back against bench, barbell on hips. Drive hips up, squeezing glutes at top. Lower with control.',
+            'Bulgarian Split Squats': 'Place rear foot on bench behind you. Lower into lunge position, then drive back up. Keep torso upright.',
+            'Default': 'Perform the exercise with proper form, focusing on controlled movements and full range of motion. Maintain proper breathing throughout.'
         };
 
         // Predefined workouts
@@ -861,10 +945,10 @@
                 calories: 300,
                 muscleGroups: ["Upper Body"],
                 exercises: [
-                    { name: "Dumbbell Bench Press", rest: 90, reps: "8-10", sets: 3 },
-                    { name: "Bent-over Rows", rest: 90, reps: "8-10", sets: 3 },
-                    { name: "Overhead Press", rest: 90, reps: "6-8", sets: 3 },
-                    { name: "Bicep Curls", rest: 60, reps: "10-12", sets: 3 }
+                    { name: "Dumbbell Bench Press", rest: 90, reps: "8-10", sets: 3, weight: "50-60 lbs" },
+                    { name: "Bent-over Rows", rest: 90, reps: "8-10", sets: 3, weight: "40-50 lbs" },
+                    { name: "Overhead Press", rest: 90, reps: "6-8", sets: 3, weight: "30-40 lbs" },
+                    { name: "Bicep Curls", rest: 60, reps: "10-12", sets: 3, weight: "20-25 lbs" }
                 ]
             },
             {
@@ -901,12 +985,14 @@
                 const savedCustom = localStorage.getItem('fitflow-custom');
                 const savedWeights = localStorage.getItem('fitflow-weights');
                 const savedExerciseHistory = localStorage.getItem('fitflow-exercise-history');
+                const savedProgressiveOverload = localStorage.getItem('fitflow-progressive-overload');
                 
                 if (savedHistory) workoutHistory = JSON.parse(savedHistory);
                 if (savedStats) userStats = JSON.parse(savedStats);
                 if (savedCustom) customWorkouts = JSON.parse(savedCustom);
                 if (savedWeights) userWeights = JSON.parse(savedWeights);
                 if (savedExerciseHistory) exerciseHistory = JSON.parse(savedExerciseHistory);
+                if (savedProgressiveOverload) progressiveOverload = JSON.parse(savedProgressiveOverload);
             } catch (e) {
                 console.error('Error loading data:', e);
             }
@@ -919,6 +1005,7 @@
                 localStorage.setItem('fitflow-custom', JSON.stringify(customWorkouts));
                 localStorage.setItem('fitflow-weights', JSON.stringify(userWeights));
                 localStorage.setItem('fitflow-exercise-history', JSON.stringify(exerciseHistory));
+                localStorage.setItem('fitflow-progressive-overload', JSON.stringify(progressiveOverload));
             } catch (e) {
                 console.error('Error saving data:', e);
             }
@@ -943,6 +1030,16 @@
                         playDingSound();
                         isResting = false;
                         isTimerRunning = true;
+                        
+                        // Check if we need to move to the next exercise
+                        const exercise = currentWorkout.exercises[currentExercise];
+                        const totalSets = exercise.sets || 1;
+                        
+                        if (currentSet > totalSets) {
+                            currentExercise++;
+                            currentSet = 1;
+                        }
+                        
                         if (currentTab === 'workout') showWorkoutTab();
                     }
                     updateRestTimerDisplay();
@@ -1096,7 +1193,7 @@
                 `;
             } else {
                 const instruction = exerciseInstructions[exercise.name] || exerciseInstructions['Default'];
-                const recommendedWeight = getRecommendedWeight(exercise.name);
+                const recommendedWeight = getRecommendedWeight(exercise.name, exercise.weight);
                 
                 content.innerHTML = `
                     <div class="workout-active">
@@ -1111,6 +1208,12 @@
                         
                         <div class="exercise-name">${exercise.name}</div>
                         
+                        ${exercise.weight || recommendedWeight ? `
+                            <div class="weight-display">
+                                💪 Weight: ${exercise.weight || recommendedWeight}
+                            </div>
+                        ` : ''}
+                        
                         ${totalSets > 1 ? `
                             <div class="set-indicator">
                                 ${Array.from({length: totalSets}, (_, i) => `
@@ -1123,7 +1226,6 @@
                         <div class="exercise-description">
                             <strong>How to perform:</strong><br>
                             ${instruction}
-                            ${recommendedWeight ? `<br><br><strong>💡 Recommended:</strong> ${recommendedWeight}` : ''}
                         </div>
                         
                         <div class="exercise-details">
@@ -1205,6 +1307,16 @@
                     ` : ''}
                 </div>
 
+                <div class="progressive-overload-box">
+                    <h4>📈 Progressive Overload</h4>
+                    <p style="font-size: 14px; opacity: 0.9; margin-bottom: 12px;">
+                        ${progressiveOverload.enabled ? `Active: +${progressiveOverload.percentage}% every ${progressiveOverload.weeks} weeks` : 'Disabled - Enable to auto-increase weights'}
+                    </p>
+                    <button class="btn" style="background: white; color: #10b981;" onclick="showProgressiveOverloadModal()">
+                        ⚙️ Configure
+                    </button>
+                </div>
+
                 <h3 style="margin-bottom: 16px; color: #1f2937;">Recent Workouts</h3>
                 
                 ${workoutHistory.length === 0 ? `
@@ -1230,20 +1342,33 @@
                     </div>
                 `).join('')}
 
-                <button class="btn" style="background: #6b7280; margin-top: 20px;" onclick="resetProgress()">
+                <button class="btn btn-danger" style="margin-top: 20px;" onclick="resetProgress()">
                     🔄 Reset All Progress
                 </button>
             `;
         }
 
-        // Get recommended weight based on user's max
-        function getRecommendedWeight(exerciseName) {
+        // Get recommended weight with progressive overload
+        function getRecommendedWeight(exerciseName, currentWeight) {
+            if (currentWeight) return currentWeight;
+            
             const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
                                     'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
             
             for (let weightEx of weightExercises) {
                 if (exerciseName.includes(weightEx) && userWeights[weightEx]) {
-                    const maxWeight = userWeights[weightEx];
+                    let maxWeight = userWeights[weightEx];
+                    
+                    // Apply progressive overload if enabled
+                    if (progressiveOverload.enabled && exerciseHistory[exerciseName]) {
+                        const lastDone = new Date(exerciseHistory[exerciseName].lastDone);
+                        const weeksSince = Math.floor((new Date() - lastDone) / (1000 * 60 * 60 * 24 * 7));
+                        const increases = Math.floor(weeksSince / progressiveOverload.weeks);
+                        if (increases > 0) {
+                            maxWeight = Math.round(maxWeight * (1 + (progressiveOverload.percentage / 100 * increases)));
+                        }
+                    }
+                    
                     const workingWeight = Math.round(maxWeight * 0.7 / 5) * 5; // 70% of max, rounded to nearest 5
                     return `${workingWeight}-${workingWeight + 10} lbs`;
                 }
@@ -1281,33 +1406,30 @@
             const totalSets = exercise.sets || 1;
             
             if (currentSet < totalSets) {
-                // More sets remaining
-                currentSet++;
+                // More sets remaining for this exercise
                 if (exercise.rest > 0) {
                     isResting = true;
                     restTimer = exercise.rest;
                     isTimerRunning = false;
                     playDingSound();
                 }
+                currentSet++;
             } else {
-                // Move to next exercise
-                currentSet = 1;
+                // Completed all sets for this exercise
                 if (currentExercise < currentWorkout.exercises.length - 1) {
+                    // Move to next exercise
                     if (exercise.rest > 0) {
                         isResting = true;
                         restTimer = exercise.rest;
                         isTimerRunning = false;
                         playDingSound();
-                        // Will move to next exercise after rest
-                        setTimeout(() => {
-                            if (isResting && restTimer <= 0) {
-                                currentExercise++;
-                            }
-                        }, exercise.rest * 1000);
+                        currentSet = totalSets + 1; // Mark that we're transitioning
                     } else {
                         currentExercise++;
+                        currentSet = 1;
                     }
                 } else {
+                    // Workout complete
                     completeWorkout();
                     return;
                 }
@@ -1317,10 +1439,15 @@
         }
 
         function skipRest() {
-            if (currentSet > (currentWorkout.exercises[currentExercise].sets || 1)) {
+            const exercise = currentWorkout.exercises[currentExercise];
+            const totalSets = exercise.sets || 1;
+            
+            if (currentSet > totalSets) {
+                // We were transitioning to next exercise
                 currentExercise++;
                 currentSet = 1;
             }
+            
             isResting = false;
             restTimer = 0;
             isTimerRunning = true;
@@ -1344,10 +1471,11 @@
             // Update exercise history
             currentWorkout.exercises.forEach(ex => {
                 if (!exerciseHistory[ex.name]) {
-                    exerciseHistory[ex.name] = { count: 0, lastDone: null };
+                    exerciseHistory[ex.name] = { count: 0, lastDone: null, lastWeight: null };
                 }
                 exerciseHistory[ex.name].count++;
                 exerciseHistory[ex.name].lastDone = new Date().toISOString();
+                if (ex.weight) exerciseHistory[ex.name].lastWeight = ex.weight;
             });
             
             saveData();
@@ -1471,6 +1599,7 @@
                         exercise.rest = 30;
                         exercise.reps = '10-15';
                         exercise.sets = 2;
+                        if (recommendedWeight) exercise.weight = recommendedWeight;
                 }
                 
                 exercises.push(exercise);
@@ -1500,7 +1629,71 @@
             };
         }
 
-        // Show Weight Modal
+        // Modal functions
+        function showProgressiveOverloadModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'progressiveModal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📈 Progressive Overload Settings</h3>
+                        <button class="close-btn" onclick="closeModal('progressiveModal')">&times;</button>
+                    </div>
+                    <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
+                        Automatically increase your weights over time to build strength progressively.
+                    </p>
+                    <form id="progressiveForm">
+                        <div class="form-group">
+                            <label class="form-label">Enable Progressive Overload</label>
+                            <select id="progressive-enabled" class="form-select">
+                                <option value="true" ${progressiveOverload.enabled ? 'selected' : ''}>Enabled</option>
+                                <option value="false" ${!progressiveOverload.enabled ? 'selected' : ''}>Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Increase Percentage</label>
+                            <select id="progressive-percentage" class="form-select">
+                                <option value="2.5" ${progressiveOverload.percentage === 2.5 ? 'selected' : ''}>2.5% (Conservative)</option>
+                                <option value="5" ${progressiveOverload.percentage === 5 ? 'selected' : ''}>5% (Standard)</option>
+                                <option value="10" ${progressiveOverload.percentage === 10 ? 'selected' : ''}>10% (Aggressive)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Frequency (weeks)</label>
+                            <select id="progressive-weeks" class="form-select">
+                                <option value="1" ${progressiveOverload.weeks === 1 ? 'selected' : ''}>Every week</option>
+                                <option value="2" ${progressiveOverload.weeks === 2 ? 'selected' : ''}>Every 2 weeks</option>
+                                <option value="4" ${progressiveOverload.weeks === 4 ? 'selected' : ''}>Every 4 weeks</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">💾 Save Settings</button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('progressiveForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleProgressiveOverloadUpdate();
+            });
+        }
+
+        function handleProgressiveOverloadUpdate() {
+            progressiveOverload = {
+                enabled: document.getElementById('progressive-enabled').value === 'true',
+                percentage: parseFloat(document.getElementById('progressive-percentage').value),
+                weeks: parseInt(document.getElementById('progressive-weeks').value)
+            };
+            
+            saveData();
+            closeModal('progressiveModal');
+            showProfileTab();
+            alert('✅ Progressive overload settings updated!');
+        }
+
         function showWeightModal() {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -1560,7 +1753,6 @@
             alert('✅ Weights updated successfully!');
         }
 
-        // Modals
         function showAIWorkoutModal() {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -1680,11 +1872,27 @@
                             <div id="createExerciseList">
                                 <div class="exercise-item">
                                     <input type="text" placeholder="Exercise name" class="form-input" style="margin-bottom: 8px;">
-                                    <div class="exercise-controls">
-                                        <input type="number" placeholder="Duration" class="form-input" value="45">
-                                        <input type="text" placeholder="Reps" class="form-input" value="10-15">
-                                        <input type="number" placeholder="Sets" class="form-input" value="3">
-                                        <input type="number" placeholder="Rest" class="form-input" value="30">
+                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                                        <div>
+                                            <div class="exercise-control-label">Duration</div>
+                                            <input type="number" class="form-input" value="45">
+                                        </div>
+                                        <div>
+                                            <div class="exercise-control-label">Reps</div>
+                                            <input type="text" class="form-input" value="10-15">
+                                        </div>
+                                        <div>
+                                            <div class="exercise-control-label">Sets</div>
+                                            <input type="number" class="form-input" value="3">
+                                        </div>
+                                        <div>
+                                            <div class="exercise-control-label">Rest</div>
+                                            <input type="number" class="form-input" value="30">
+                                        </div>
+                                        <div>
+                                            <div class="exercise-control-label">Weight</div>
+                                            <input type="text" class="form-input" placeholder="Optional">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1716,15 +1924,31 @@
                 <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                     <input type="text" placeholder="Exercise name" class="form-input" style="flex: 1;">
                     <button type="button" onclick="this.parentElement.parentElement.remove()" 
-                            style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;">
+                            class="btn btn-danger" style="width: auto; padding: 8px 12px;">
                         Remove
                     </button>
                 </div>
-                <div class="exercise-controls">
-                    <input type="number" placeholder="Duration" class="form-input" value="45">
-                    <input type="text" placeholder="Reps" class="form-input" value="10-15">
-                    <input type="number" placeholder="Sets" class="form-input" value="3">
-                    <input type="number" placeholder="Rest" class="form-input" value="30">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                    <div>
+                        <div class="exercise-control-label">Duration</div>
+                        <input type="number" class="form-input" value="45">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Reps</div>
+                        <input type="text" class="form-input" value="10-15">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Sets</div>
+                        <input type="number" class="form-input" value="3">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Rest</div>
+                        <input type="number" class="form-input" value="30">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Weight</div>
+                        <input type="text" class="form-input" placeholder="Optional">
+                    </div>
                 </div>
             `;
             exerciseList.appendChild(newExercise);
@@ -1772,15 +1996,31 @@
                                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                                             <input type="text" value="${exercise.name}" placeholder="Exercise name" class="form-input" style="flex: 1;">
                                             <button type="button" onclick="this.parentElement.parentElement.remove()" 
-                                                    style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;">
+                                                    class="btn btn-danger" style="width: auto; padding: 8px 12px;">
                                                 Remove
                                             </button>
                                         </div>
-                                        <div class="exercise-controls">
-                                            <input type="number" value="${exercise.duration || ''}" placeholder="Duration" class="form-input">
-                                            <input type="text" value="${exercise.reps || ''}" placeholder="Reps" class="form-input">
-                                            <input type="number" value="${exercise.sets || ''}" placeholder="Sets" class="form-input">
-                                            <input type="number" value="${exercise.rest || ''}" placeholder="Rest" class="form-input">
+                                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                                            <div>
+                                                <div class="exercise-control-label">Duration</div>
+                                                <input type="number" value="${exercise.duration || ''}" class="form-input">
+                                            </div>
+                                            <div>
+                                                <div class="exercise-control-label">Reps</div>
+                                                <input type="text" value="${exercise.reps || ''}" class="form-input">
+                                            </div>
+                                            <div>
+                                                <div class="exercise-control-label">Sets</div>
+                                                <input type="number" value="${exercise.sets || ''}" class="form-input">
+                                            </div>
+                                            <div>
+                                                <div class="exercise-control-label">Rest</div>
+                                                <input type="number" value="${exercise.rest || ''}" class="form-input">
+                                            </div>
+                                            <div>
+                                                <div class="exercise-control-label">Weight</div>
+                                                <input type="text" value="${exercise.weight || ''}" class="form-input" placeholder="Optional">
+                                            </div>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -1811,15 +2051,31 @@
                 <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                     <input type="text" placeholder="Exercise name" class="form-input" style="flex: 1;" value="New Exercise">
                     <button type="button" onclick="this.parentElement.parentElement.remove()" 
-                            style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;">
+                            class="btn btn-danger" style="width: auto; padding: 8px 12px;">
                         Remove
                     </button>
                 </div>
-                <div class="exercise-controls">
-                    <input type="number" placeholder="Duration" class="form-input" value="45">
-                    <input type="text" placeholder="Reps" class="form-input" value="10-15">
-                    <input type="number" placeholder="Sets" class="form-input" value="3">
-                    <input type="number" placeholder="Rest" class="form-input" value="30">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                    <div>
+                        <div class="exercise-control-label">Duration</div>
+                        <input type="number" class="form-input" value="45">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Reps</div>
+                        <input type="text" class="form-input" value="10-15">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Sets</div>
+                        <input type="number" class="form-input" value="3">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Rest</div>
+                        <input type="number" class="form-input" value="30">
+                    </div>
+                    <div>
+                        <div class="exercise-control-label">Weight</div>
+                        <input type="text" class="form-input" placeholder="Optional">
+                    </div>
                 </div>
             `;
             exerciseList.appendChild(newExercise);
@@ -1871,6 +2127,7 @@
                                     ${exercise.reps ? `<span style="background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 6px; font-size: 12px;">${exercise.reps} reps</span>` : ''}
                                     ${exercise.sets ? `<span style="background: #e9d5ff; color: #7c3aed; padding: 4px 8px; border-radius: 6px; font-size: 12px;">${exercise.sets} sets</span>` : ''}
                                     ${exercise.rest ? `<span style="background: #fed7aa; color: #c2410c; padding: 4px 8px; border-radius: 6px; font-size: 12px;">${exercise.rest}s rest</span>` : ''}
+                                    ${exercise.weight ? `<span style="background: #fce7f3; color: #be185d; padding: 4px 8px; border-radius: 6px; font-size: 12px;">${exercise.weight}</span>` : ''}
                                 </div>
                             </div>
                         `).join('')}
@@ -1923,7 +2180,8 @@
                     duration: inputs[1].value ? parseInt(inputs[1].value) : null,
                     reps: inputs[2].value || null,
                     sets: inputs[3].value ? parseInt(inputs[3].value) : 1,
-                    rest: inputs[4].value ? parseInt(inputs[4].value) : 30
+                    rest: inputs[4].value ? parseInt(inputs[4].value) : 30,
+                    weight: inputs[5].value || null
                 });
             });
             
@@ -1961,7 +2219,8 @@
                     duration: inputs[1].value ? parseInt(inputs[1].value) : null,
                     reps: inputs[2].value || null,
                     sets: inputs[3].value ? parseInt(inputs[3].value) : 1,
-                    rest: inputs[4].value ? parseInt(inputs[4].value) : 30
+                    rest: inputs[4].value ? parseInt(inputs[4].value) : 30,
+                    weight: inputs[5].value || null
                 });
             });
             
