@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     <title>FitFlow - Your Personal Workout Companion</title>
     <style>
         * { 
@@ -14,7 +15,19 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        html, body {
+        input, textarea, select {
+            -webkit-user-select: text;
+            user-select: text;
+            font-size: 16px !important; /* Prevents zoom on iOS */
+        }
+        
+        @media (max-width: 390px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+        }
+        
+        html {
             height: 100%;
             overflow: hidden;
             position: fixed;
@@ -22,9 +35,16 @@
         }
         
         body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            position: fixed;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
+            -webkit-overflow-scrolling: touch;
+            touch-action: manipulation;
         }
         
         .app-container {
@@ -36,17 +56,26 @@
             display: flex;
             flex-direction: column;
             background: #f9fafb;
-            max-width: 430px;
+            max-width: 100%;
             margin: 0 auto;
             width: 100%;
-            height: 100%;
-            box-shadow: 0 0 40px rgba(0,0,0,0.3);
+            height: 100vh;
+            height: 100dvh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 430px) {
+            .app-container {
+                max-width: 430px;
+                box-shadow: 0 0 40px rgba(0,0,0,0.3);
+            }
         }
         
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding-top: env(safe-area-inset-top, 20px);
+            padding-top: max(env(safe-area-inset-top, 20px), 20px);
             padding-left: 20px;
             padding-right: 20px;
             padding-bottom: 20px;
@@ -55,6 +84,11 @@
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
         }
         
         .header::before {
@@ -76,9 +110,11 @@
         .header h1 {
             font-size: 28px;
             font-weight: 700;
+            margin: 0;
             margin-bottom: 4px;
             position: relative;
             z-index: 1;
+            text-align: center;
         }
         
         .header p {
@@ -86,26 +122,28 @@
             font-size: 14px;
             position: relative;
             z-index: 1;
+            margin: 0;
+            text-align: center;
         }
         
         .content {
-            flex: 1;
+            flex: 1 1 auto;
             overflow-y: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 20px;
             scroll-behavior: smooth;
             position: relative;
+            min-height: 0;
         }
         
         .nav {
             background: white;
             border-top: 1px solid #e5e7eb;
             display: flex;
-            padding-top: 8px;
-            padding-left: 8px;
-            padding-right: 8px;
-            padding-bottom: calc(env(safe-area-inset-bottom, 8px) + 8px);
+            padding: 8px;
+            padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
             box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
             position: relative;
             z-index: 100;
@@ -457,13 +495,15 @@
         .modal-content {
             background: white;
             border-radius: 20px;
-            padding: 24px;
-            width: 100%;
+            padding: 20px;
+            width: calc(100% - 40px);
             max-width: 400px;
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             animation: slideUpModal 0.3s ease;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin: 20px;
         }
         
         @keyframes slideUpModal {
@@ -519,8 +559,10 @@
             padding: 12px 16px;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 16px;
             transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         .form-input:focus, .form-select:focus {
@@ -566,16 +608,30 @@
         
         .exercise-controls {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
             gap: 8px;
             margin-top: 12px;
         }
         
+        @media (max-width: 390px) {
+            .exercise-controls {
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                gap: 4px;
+            }
+        }
+        
         .exercise-control-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #6b7280;
             margin-bottom: 4px;
             font-weight: 600;
+            text-align: center;
+        }
+        
+        @media (max-width: 390px) {
+            .exercise-control-label {
+                font-size: 9px;
+            }
         }
         
         .weight-tracker {
@@ -686,24 +742,39 @@
         }
         
         /* Responsive Design */
-        @media (max-width: 375px) {
+        @media (max-width: 390px) {
             .header h1 { font-size: 24px; }
+            .header p { font-size: 12px; }
+            .header { padding-bottom: 16px; }
             .timer { font-size: 48px; }
-            .exercise-name { font-size: 24px; }
+            .exercise-name { font-size: 22px; }
             .stat-number { font-size: 24px; }
             .btn { padding: 12px 16px; font-size: 14px; }
-            .nav-item { font-size: 10px; }
+            .nav-item { font-size: 10px; padding: 10px 4px; }
             .nav-item .icon { font-size: 18px; }
             .exercise-controls { grid-template-columns: 1fr 1fr; }
+            .card { padding: 16px; margin-bottom: 12px; }
+            .content { padding: 16px; }
+            .workout-info { font-size: 12px; }
+            .modal-content { padding: 16px; }
+            .form-input, .form-select { font-size: 16px !important; }
         }
         
-        @media (min-width: 430px) {
+        @media (max-width: 375px) {
+            .stats-grid { gap: 12px; }
+            .stat-card { padding: 16px; }
+            .exercise-details { grid-template-columns: 1fr 1fr; }
+        }
+        
+        @media (min-width: 768px) {
             .app-container {
-                border-radius: 20px;
+                max-width: 430px;
                 margin: 20px auto;
+                border-radius: 20px;
                 height: calc(100% - 40px);
-                top: 20px;
-                bottom: 20px;
+                position: relative;
+                top: auto;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             }
         }
         
@@ -1031,15 +1102,6 @@
                         isResting = false;
                         isTimerRunning = true;
                         
-                        // Check if we need to move to the next exercise
-                        const exercise = currentWorkout.exercises[currentExercise];
-                        const totalSets = exercise.sets || 1;
-                        
-                        if (currentSet > totalSets) {
-                            currentExercise++;
-                            currentSet = 1;
-                        }
-                        
                         if (currentTab === 'workout') showWorkoutTab();
                     }
                     updateRestTimerDisplay();
@@ -1159,26 +1221,40 @@
             const setsRemaining = totalSets - currentSet + 1;
 
             if (isResting) {
+                // Determine if we're resting between sets or between exercises
+                const isRestingBetweenSets = currentSet <= totalSets;
+                const actualSetsRemaining = isRestingBetweenSets ? (totalSets - currentSet + 1) : 0;
+                const nextExercise = currentWorkout.exercises[currentExercise + 1];
+                
                 content.innerHTML = `
                     <div class="workout-active">
                         <h2>${currentWorkout.name}</h2>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${progress}%"></div>
                         </div>
+                        <p style="color: #6b7280; margin-bottom: 12px;">
+                            Exercise ${currentExercise + (isRestingBetweenSets ? 1 : 2)} of ${currentWorkout.exercises.length}
+                        </p>
                         
                         <div class="rest-display">
                             <h3>🔥 Rest Time</h3>
                             <div class="rest-timer">${formatTime(restTimer)}</div>
                             
-                            ${setsRemaining > 1 ? `
+                            ${isRestingBetweenSets && actualSetsRemaining > 0 ? `
                                 <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; backdrop-filter: blur(10px);">
-                                    <strong>${setsRemaining - 1}</strong> set${setsRemaining - 1 > 1 ? 's' : ''} remaining
+                                    <strong>${actualSetsRemaining}</strong> set${actualSetsRemaining > 1 ? 's' : ''} remaining of ${exercise.name}
+                                </div>
+                            ` : !isRestingBetweenSets && nextExercise ? `
+                                <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; backdrop-filter: blur(10px);">
+                                    Moving to next exercise
                                 </div>
                             ` : ''}
                             
                             <div class="next-exercise">
                                 <div style="opacity: 0.9; margin-bottom: 4px;">Next:</div>
-                                <strong>${setsRemaining > 1 ? exercise.name : (currentWorkout.exercises[currentExercise + 1]?.name || 'Workout Complete!')}</strong>
+                                <strong>${isRestingBetweenSets && actualSetsRemaining > 0 ? 
+                                    `${exercise.name} - Set ${currentSet}` : 
+                                    (nextExercise?.name || 'Workout Complete!')}</strong>
                             </div>
                             
                             <button class="btn" style="background: white; color: #f59e0b; margin-top: 20px;" onclick="skipRest()">
@@ -1201,10 +1277,21 @@
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${progress}%"></div>
                         </div>
-                        <p style="color: #6b7280; margin-bottom: 12px;">
-                            Exercise ${currentExercise + 1} of ${currentWorkout.exercises.length} • 
-                            <span class="timer">${formatTime(timer)}</span>
+                        <p style="color: #6b7280; margin-bottom: 4px;">
+                            <strong style="color: #667eea; font-size: 16px;">Exercise ${currentExercise + 1} of ${currentWorkout.exercises.length}</strong>
                         </p>
+                        <p style="color: #6b7280; margin-bottom: 12px;">
+                            Total Time: <span class="timer">${formatTime(timer)}</span>
+                        </p>
+                        
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                    color: white; 
+                                    padding: 8px 16px; 
+                                    border-radius: 12px; 
+                                    margin-bottom: 12px;
+                                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                            <strong>Current Exercise:</strong>
+                        </div>
                         
                         <div class="exercise-name">${exercise.name}</div>
                         
@@ -1220,7 +1307,9 @@
                                     <div class="set-dot ${i < currentSet - 1 ? 'completed' : i === currentSet - 1 ? 'current' : ''}"></div>
                                 `).join('')}
                             </div>
-                            <p style="color: #6b7280; margin-bottom: 16px;">Set ${currentSet} of ${totalSets}</p>
+                            <p style="color: #6b7280; margin-bottom: 16px; font-weight: 600;">
+                                Set ${currentSet} of ${totalSets}
+                            </p>
                         ` : ''}
                         
                         <div class="exercise-description">
@@ -1423,11 +1512,9 @@
                         restTimer = exercise.rest;
                         isTimerRunning = false;
                         playDingSound();
-                        currentSet = totalSets + 1; // Mark that we're transitioning
-                    } else {
-                        currentExercise++;
-                        currentSet = 1;
                     }
+                    currentExercise++;
+                    currentSet = 1;
                 } else {
                     // Workout complete
                     completeWorkout();
@@ -1439,15 +1526,6 @@
         }
 
         function skipRest() {
-            const exercise = currentWorkout.exercises[currentExercise];
-            const totalSets = exercise.sets || 1;
-            
-            if (currentSet > totalSets) {
-                // We were transitioning to next exercise
-                currentExercise++;
-                currentSet = 1;
-            }
-            
             isResting = false;
             restTimer = 0;
             isTimerRunning = true;
@@ -1872,26 +1950,26 @@
                             <div id="createExerciseList">
                                 <div class="exercise-item">
                                     <input type="text" placeholder="Exercise name" class="form-input" style="margin-bottom: 8px;">
-                                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px;">
                                         <div>
-                                            <div class="exercise-control-label">Duration</div>
-                                            <input type="number" class="form-input" value="45">
+                                            <div class="exercise-control-label">Duration(s)</div>
+                                            <input type="number" class="form-input" value="45" style="padding: 6px; font-size: 14px;">
                                         </div>
                                         <div>
                                             <div class="exercise-control-label">Reps</div>
-                                            <input type="text" class="form-input" value="10-15">
+                                            <input type="text" class="form-input" value="10-15" style="padding: 6px; font-size: 14px;">
                                         </div>
                                         <div>
                                             <div class="exercise-control-label">Sets</div>
-                                            <input type="number" class="form-input" value="3">
+                                            <input type="number" class="form-input" value="3" style="padding: 6px; font-size: 14px;">
                                         </div>
                                         <div>
-                                            <div class="exercise-control-label">Rest</div>
-                                            <input type="number" class="form-input" value="30">
+                                            <div class="exercise-control-label">Rest(s)</div>
+                                            <input type="number" class="form-input" value="30" style="padding: 6px; font-size: 14px;">
                                         </div>
                                         <div>
                                             <div class="exercise-control-label">Weight</div>
-                                            <input type="text" class="form-input" placeholder="Optional">
+                                            <input type="text" class="form-input" placeholder="lbs" style="padding: 6px; font-size: 14px;">
                                         </div>
                                     </div>
                                 </div>
@@ -1928,26 +2006,26 @@
                         Remove
                     </button>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px;">
                     <div>
-                        <div class="exercise-control-label">Duration</div>
-                        <input type="number" class="form-input" value="45">
+                        <div class="exercise-control-label">Duration(s)</div>
+                        <input type="number" class="form-input" value="45" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
                         <div class="exercise-control-label">Reps</div>
-                        <input type="text" class="form-input" value="10-15">
+                        <input type="text" class="form-input" value="10-15" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
                         <div class="exercise-control-label">Sets</div>
-                        <input type="number" class="form-input" value="3">
+                        <input type="number" class="form-input" value="3" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
-                        <div class="exercise-control-label">Rest</div>
-                        <input type="number" class="form-input" value="30">
+                        <div class="exercise-control-label">Rest(s)</div>
+                        <input type="number" class="form-input" value="30" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
                         <div class="exercise-control-label">Weight</div>
-                        <input type="text" class="form-input" placeholder="Optional">
+                        <input type="text" class="form-input" placeholder="lbs" style="padding: 6px; font-size: 14px;">
                     </div>
                 </div>
             `;
@@ -2000,26 +2078,26 @@
                                                 Remove
                                             </button>
                                         </div>
-                                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px;">
                                             <div>
-                                                <div class="exercise-control-label">Duration</div>
-                                                <input type="number" value="${exercise.duration || ''}" class="form-input">
+                                                <div class="exercise-control-label">Duration(s)</div>
+                                                <input type="number" value="${exercise.duration || ''}" class="form-input" style="padding: 6px; font-size: 14px;">
                                             </div>
                                             <div>
                                                 <div class="exercise-control-label">Reps</div>
-                                                <input type="text" value="${exercise.reps || ''}" class="form-input">
+                                                <input type="text" value="${exercise.reps || ''}" class="form-input" style="padding: 6px; font-size: 14px;">
                                             </div>
                                             <div>
                                                 <div class="exercise-control-label">Sets</div>
-                                                <input type="number" value="${exercise.sets || ''}" class="form-input">
+                                                <input type="number" value="${exercise.sets || ''}" class="form-input" style="padding: 6px; font-size: 14px;">
                                             </div>
                                             <div>
-                                                <div class="exercise-control-label">Rest</div>
-                                                <input type="number" value="${exercise.rest || ''}" class="form-input">
+                                                <div class="exercise-control-label">Rest(s)</div>
+                                                <input type="number" value="${exercise.rest || ''}" class="form-input" style="padding: 6px; font-size: 14px;">
                                             </div>
                                             <div>
                                                 <div class="exercise-control-label">Weight</div>
-                                                <input type="text" value="${exercise.weight || ''}" class="form-input" placeholder="Optional">
+                                                <input type="text" value="${exercise.weight || ''}" class="form-input" placeholder="lbs" style="padding: 6px; font-size: 14px;">
                                             </div>
                                         </div>
                                     </div>
@@ -2055,26 +2133,26 @@
                         Remove
                     </button>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px;">
                     <div>
-                        <div class="exercise-control-label">Duration</div>
-                        <input type="number" class="form-input" value="45">
+                        <div class="exercise-control-label">Duration(s)</div>
+                        <input type="number" class="form-input" value="45" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
                         <div class="exercise-control-label">Reps</div>
-                        <input type="text" class="form-input" value="10-15">
+                        <input type="text" class="form-input" value="10-15" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
                         <div class="exercise-control-label">Sets</div>
-                        <input type="number" class="form-input" value="3">
+                        <input type="number" class="form-input" value="3" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
-                        <div class="exercise-control-label">Rest</div>
-                        <input type="number" class="form-input" value="30">
+                        <div class="exercise-control-label">Rest(s)</div>
+                        <input type="number" class="form-input" value="30" style="padding: 6px; font-size: 14px;">
                     </div>
                     <div>
                         <div class="exercise-control-label">Weight</div>
-                        <input type="text" class="form-input" placeholder="Optional">
+                        <input type="text" class="form-input" placeholder="lbs" style="padding: 6px; font-size: 14px;">
                     </div>
                 </div>
             `;
