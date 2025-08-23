@@ -337,28 +337,88 @@
             'Calves', 'Forearms', 'Traps', 'Lats'
         ];
 
-        // Exercise database organized by muscle groups
+        // Exercise database organized by muscle groups with priority ordering
         const exerciseDatabase = {
-            'Full Body': ['Burpees', 'Thrusters', 'Man Makers', 'Turkish Get-ups', 'Mountain Climbers', 'Bear Crawls'],
-            'Upper Body': ['Push-ups', 'Pull-ups', 'Dips', 'Pike Push-ups', 'Handstand Push-ups'],
-            'Lower Body': ['Squats', 'Lunges', 'Jump Squats', 'Single Leg Deadlifts', 'Wall Sits', 'Calf Raises'],
-            'Push (Chest/Shoulders/Triceps)': ['Push-ups', 'Dumbbell Bench Press', 'Overhead Press', 'Dips', 'Tricep Extensions', 'Lateral Raises'],
-            'Pull (Back/Biceps)': ['Pull-ups', 'Bent-over Rows', 'Lat Pulldowns', 'Bicep Curls', 'Face Pulls', 'Reverse Flyes'],
-            'Legs': ['Squats', 'Deadlifts', 'Lunges', 'Leg Press', 'Calf Raises', 'Leg Curls', 'Leg Extensions'],
-            'Chest': ['Bench Press', 'Push-ups', 'Chest Flyes', 'Incline Press', 'Decline Press', 'Chest Dips'],
-            'Back': ['Deadlifts', 'Bent-over Rows', 'Pull-ups', 'Lat Pulldowns', 'T-Bar Rows', 'Cable Rows'],
-            'Shoulders': ['Overhead Press', 'Lateral Raises', 'Front Raises', 'Rear Delt Flyes', 'Upright Rows', 'Arnold Press'],
-            'Arms': ['Bicep Curls', 'Tricep Extensions', 'Hammer Curls', 'Close-Grip Push-ups', 'Tricep Dips', 'Preacher Curls'],
-            'Biceps': ['Bicep Curls', 'Hammer Curls', 'Preacher Curls', 'Cable Curls', 'Concentration Curls'],
-            'Triceps': ['Tricep Extensions', 'Close-Grip Push-ups', 'Tricep Dips', 'Overhead Tricep Press', 'Diamond Push-ups'],
-            'Core/Abs': ['Plank', 'Russian Twists', 'Bicycle Crunches', 'Dead Bug', 'Mountain Climbers', 'Leg Raises'],
-            'Glutes': ['Hip Thrusts', 'Glute Bridges', 'Bulgarian Split Squats', 'Clamshells', 'Fire Hydrants'],
-            'Quadriceps': ['Squats', 'Leg Extensions', 'Lunges', 'Jump Squats', 'Wall Sits', 'Step-ups'],
-            'Hamstrings': ['Romanian Deadlifts', 'Leg Curls', 'Good Mornings', 'Single Leg Deadlifts', 'Glute Ham Raises'],
-            'Calves': ['Calf Raises', 'Jump Rope', 'Jumping Jacks', 'Box Jumps', 'Pogo Jumps'],
-            'Forearms': ['Wrist Curls', 'Reverse Wrist Curls', 'Farmers Walks', 'Grip Squeezes', 'Plate Pinches'],
-            'Traps': ['Shrugs', 'Upright Rows', 'Face Pulls', 'High Pulls', 'Barbell Shrugs'],
-            'Lats': ['Pull-ups', 'Lat Pulldowns', 'T-Bar Rows', 'Wide-Grip Rows', 'Straight Arm Pulldowns']
+            'Full Body': {
+                primary: ['Burpees', 'Thrusters', 'Man Makers', 'Turkish Get-ups'],
+                secondary: ['Mountain Climbers', 'Bear Crawls', 'Jumping Jacks', 'High Knees']
+            },
+            'Upper Body': {
+                primary: ['Pull-ups', 'Push-ups', 'Dips'],
+                secondary: ['Pike Push-ups', 'Handstand Push-ups', 'Tricep Dips']
+            },
+            'Lower Body': {
+                primary: ['Squats', 'Lunges', 'Single Leg Deadlifts'],
+                secondary: ['Jump Squats', 'Wall Sits', 'Calf Raises', 'Step-ups']
+            },
+            'Push (Chest/Shoulders/Triceps)': {
+                primary: ['Dumbbell Bench Press', 'Push-ups', 'Overhead Press'],
+                secondary: ['Dips', 'Tricep Extensions', 'Lateral Raises', 'Front Raises']
+            },
+            'Pull (Back/Biceps)': {
+                primary: ['Pull-ups', 'Bent-over Rows', 'Lat Pulldowns'],
+                secondary: ['Bicep Curls', 'Face Pulls', 'Reverse Flyes', 'Hammer Curls']
+            },
+            'Legs': {
+                primary: ['Squats', 'Deadlifts', 'Lunges', 'Leg Press'],
+                secondary: ['Calf Raises', 'Leg Curls', 'Leg Extensions', 'Wall Sits']
+            },
+            'Chest': {
+                primary: ['Bench Press', 'Dumbbell Bench Press', 'Push-ups'],
+                secondary: ['Chest Flyes', 'Incline Press', 'Decline Press', 'Chest Dips']
+            },
+            'Back': {
+                primary: ['Deadlifts', 'Pull-ups', 'Bent-over Rows'],
+                secondary: ['Lat Pulldowns', 'T-Bar Rows', 'Cable Rows', 'Face Pulls']
+            },
+            'Shoulders': {
+                primary: ['Overhead Press', 'Arnold Press', 'Pike Push-ups'],
+                secondary: ['Lateral Raises', 'Front Raises', 'Rear Delt Flyes', 'Upright Rows']
+            },
+            'Arms': {
+                primary: ['Close-Grip Push-ups', 'Tricep Dips', 'Pull-ups'],
+                secondary: ['Bicep Curls', 'Tricep Extensions', 'Hammer Curls', 'Preacher Curls']
+            },
+            'Biceps': {
+                primary: ['Bicep Curls', 'Hammer Curls'],
+                secondary: ['Preacher Curls', 'Cable Curls', 'Concentration Curls']
+            },
+            'Triceps': {
+                primary: ['Close-Grip Push-ups', 'Tricep Dips'],
+                secondary: ['Tricep Extensions', 'Overhead Tricep Press', 'Diamond Push-ups']
+            },
+            'Core/Abs': {
+                primary: ['Plank', 'Dead Bug', 'Russian Twists'],
+                secondary: ['Bicycle Crunches', 'Mountain Climbers', 'Leg Raises']
+            },
+            'Glutes': {
+                primary: ['Hip Thrusts', 'Bulgarian Split Squats'],
+                secondary: ['Glute Bridges', 'Clamshells', 'Fire Hydrants']
+            },
+            'Quadriceps': {
+                primary: ['Squats', 'Lunges', 'Jump Squats'],
+                secondary: ['Leg Extensions', 'Wall Sits', 'Step-ups']
+            },
+            'Hamstrings': {
+                primary: ['Romanian Deadlifts', 'Good Mornings'],
+                secondary: ['Leg Curls', 'Single Leg Deadlifts', 'Glute Ham Raises']
+            },
+            'Calves': {
+                primary: ['Calf Raises', 'Jump Rope'],
+                secondary: ['Jumping Jacks', 'Box Jumps', 'Pogo Jumps']
+            },
+            'Forearms': {
+                primary: ['Farmers Walks', 'Grip Squeezes'],
+                secondary: ['Wrist Curls', 'Reverse Wrist Curls', 'Plate Pinches']
+            },
+            'Traps': {
+                primary: ['Shrugs', 'Upright Rows'],
+                secondary: ['Face Pulls', 'High Pulls', 'Barbell Shrugs']
+            },
+            'Lats': {
+                primary: ['Pull-ups', 'Lat Pulldowns'],
+                secondary: ['T-Bar Rows', 'Wide-Grip Rows', 'Straight Arm Pulldowns']
+            }
         };
 
         // Predefined workouts
@@ -457,9 +517,9 @@
         // Load/save data
         function loadData() {
             try {
-                const savedHistory = sessionStorage.getItem('fitflow-history');
-                const savedStats = sessionStorage.getItem('fitflow-stats');
-                const savedCustom = sessionStorage.getItem('fitflow-custom');
+                const savedHistory = localStorage.getItem('fitflow-history');
+                const savedStats = localStorage.getItem('fitflow-stats');
+                const savedCustom = localStorage.getItem('fitflow-custom');
                 
                 if (savedHistory) workoutHistory = JSON.parse(savedHistory);
                 if (savedStats) userStats = JSON.parse(savedStats);
@@ -471,9 +531,9 @@
 
         function saveData() {
             try {
-                sessionStorage.setItem('fitflow-history', JSON.stringify(workoutHistory));
-                sessionStorage.setItem('fitflow-stats', JSON.stringify(userStats));
-                sessionStorage.setItem('fitflow-custom', JSON.stringify(customWorkouts));
+                localStorage.setItem('fitflow-history', JSON.stringify(workoutHistory));
+                localStorage.setItem('fitflow-stats', JSON.stringify(userStats));
+                localStorage.setItem('fitflow-custom', JSON.stringify(customWorkouts));
             } catch (e) {
                 console.error('Error saving data:', e);
             }
@@ -587,6 +647,7 @@
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})">Details</button>
+                                ${workout.custom || workout.aiGenerated ? `<button class="btn" style="background: #f59e0b;" onclick="editWorkout(${workout.id})">Edit</button>` : ''}
                                 <button class="btn" onclick="startWorkout(${workout.id})">Start</button>
                             </div>
                         </div>
@@ -839,6 +900,235 @@
             }
         }
 
+        function editWorkout(id) {
+            const allWorkouts = [...workouts, ...customWorkouts];
+            const workout = allWorkouts.find(w => w.id === id);
+            if (!workout) return;
+
+            // Check if it's a predefined workout
+            if (!workout.custom && !workout.aiGenerated) {
+                alert('⚠️ You can only edit custom and AI-generated workouts. Predefined workouts cannot be modified.');
+                return;
+            }
+
+            showEditWorkoutModal(workout);
+        }
+
+        function showEditWorkoutModal(workout) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'editModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>✏️ Edit Workout</h3>
+                        <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
+                    </div>
+                    <form id="editWorkoutForm">
+                        <div class="form-group">
+                            <label class="form-label">Workout Name</label>
+                            <input type="text" id="edit-workout-name" class="form-input" value="${workout.name}" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select id="edit-workout-type" class="form-select">
+                                    ${workoutTypes.map(type => 
+                                        `<option value="${type}" ${workout.type === type ? 'selected' : ''}>${type}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Difficulty</label>
+                                <select id="edit-workout-difficulty" class="form-select">
+                                    <option value="Beginner" ${workout.difficulty === 'Beginner' ? 'selected' : ''}>Beginner</option>
+                                    <option value="Intermediate" ${workout.difficulty === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+                                    <option value="Advanced" ${workout.difficulty === 'Advanced' ? 'selected' : ''}>Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Duration (min)</label>
+                                <input type="number" id="edit-workout-duration" class="form-input" value="${workout.duration}" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Est. Calories</label>
+                                <input type="number" id="edit-workout-calories" class="form-input" value="${workout.calories}" min="1" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Muscle Groups</label>
+                            <div class="equipment-list">
+                                ${muscleGroups.map(muscle => `
+                                    <div class="equipment-item">
+                                        <input type="checkbox" name="muscleGroups" value="${muscle}" id="edit-muscle-${muscle.replace(/[^a-zA-Z0-9]/g, '')}" 
+                                               ${workout.muscleGroups && workout.muscleGroups.includes(muscle) ? 'checked' : ''}>
+                                        <label for="edit-muscle-${muscle.replace(/[^a-zA-Z0-9]/g, '')}">${muscle}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Equipment Needed</label>
+                            <div class="equipment-list">
+                                ${equipmentOptions.map(equipment => {
+                                    const equipmentArray = Array.isArray(workout.equipment) ? workout.equipment : [workout.equipment];
+                                    return `
+                                        <div class="equipment-item">
+                                            <input type="checkbox" name="equipment" value="${equipment}" id="edit-equip-${equipment.replace(/[^a-zA-Z0-9]/g, '')}" 
+                                                   ${equipmentArray.includes(equipment) ? 'checked' : ''}>
+                                            <label for="edit-equip-${equipment.replace(/[^a-zA-Z0-9]/g, '')}">${equipment}</label>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Exercises</label>
+                            <div id="exerciseList" style="max-height: 200px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px;">
+                                ${workout.exercises.map((exercise, index) => `
+                                    <div class="exercise-edit" data-index="${index}" style="background: #f9fafb; padding: 12px; margin-bottom: 8px; border-radius: 8px;">
+                                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                                            <input type="text" value="${exercise.name}" placeholder="Exercise name" 
+                                                   style="flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 8px;">
+                                            <button type="button" onclick="removeExercise(${index})" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Remove</button>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; font-size: 12px;">
+                                            <input type="number" value="${exercise.duration || ''}" placeholder="Duration (s)" 
+                                                   style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                                            <input type="text" value="${exercise.reps || ''}" placeholder="Reps" 
+                                                   style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                                            <input type="number" value="${exercise.sets || ''}" placeholder="Sets" 
+                                                   style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                                            <input type="number" value="${exercise.rest || ''}" placeholder="Rest (s)" 
+                                                   style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button type="button" onclick="addExercise()" style="width: 100%; margin-top: 8px; background: #22c55e; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer;">
+                                + Add Exercise
+                            </button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                            <button type="submit" class="btn" style="background: #f59e0b;">💾 Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Store workout ID for saving
+            document.getElementById('editWorkoutForm').setAttribute('data-workout-id', workout.id);
+            
+            // Add event listeners
+            document.getElementById('editWorkoutForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleEditWorkout();
+            });
+        }
+
+        // Global functions for exercise editing
+        window.addExercise = function() {
+            const exerciseList = document.getElementById('exerciseList');
+            const exerciseCount = exerciseList.children.length;
+            const newExercise = document.createElement('div');
+            newExercise.className = 'exercise-edit';
+            newExercise.setAttribute('data-index', exerciseCount);
+            newExercise.style = 'background: #f9fafb; padding: 12px; margin-bottom: 8px; border-radius: 8px;';
+            newExercise.innerHTML = `
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                    <input type="text" value="New Exercise" placeholder="Exercise name" 
+                           style="flex: 1; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 8px;">
+                    <button type="button" onclick="removeExercise(${exerciseCount})" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Remove</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; font-size: 12px;">
+                    <input type="number" value="60" placeholder="Duration (s)" 
+                           style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                    <input type="text" value="10-15" placeholder="Reps" 
+                           style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                    <input type="number" value="1" placeholder="Sets" 
+                           style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                    <input type="number" value="30" placeholder="Rest (s)" 
+                           style="padding: 4px; border: 1px solid #d1d5db; border-radius: 4px;">
+                </div>
+            `;
+            exerciseList.appendChild(newExercise);
+        };
+
+        window.removeExercise = function(index) {
+            const exerciseList = document.getElementById('exerciseList');
+            const exercises = exerciseList.querySelectorAll('.exercise-edit');
+            if (exercises.length > 1) {
+                exercises[index].remove();
+                // Update indices
+                const remainingExercises = exerciseList.querySelectorAll('.exercise-edit');
+                remainingExercises.forEach((exercise, newIndex) => {
+                    exercise.setAttribute('data-index', newIndex);
+                    const removeBtn = exercise.querySelector('button');
+                    removeBtn.setAttribute('onclick', `removeExercise(${newIndex})`);
+                });
+            } else {
+                alert('⚠️ Workout must have at least one exercise');
+            }
+        };
+
+        function handleEditWorkout() {
+            const form = document.getElementById('editWorkoutForm');
+            const workoutId = parseInt(form.getAttribute('data-workout-id'));
+            
+            const formData = new FormData(form);
+            const selectedEquipment = Array.from(formData.getAll('equipment'));
+            const selectedMuscleGroups = Array.from(formData.getAll('muscleGroups'));
+            
+            // Collect exercises
+            const exercises = [];
+            const exerciseElements = document.querySelectorAll('.exercise-edit');
+            exerciseElements.forEach(element => {
+                const inputs = element.querySelectorAll('input');
+                const exercise = {
+                    name: inputs[0].value || 'Exercise',
+                    duration: inputs[1].value ? parseInt(inputs[1].value) : null,
+                    reps: inputs[2].value || null,
+                    sets: inputs[3].value ? parseInt(inputs[3].value) : null,
+                    rest: inputs[4].value ? parseInt(inputs[4].value) : 30
+                };
+                exercises.push(exercise);
+            });
+            
+            const updatedWorkout = {
+                id: workoutId,
+                name: document.getElementById('edit-workout-name').value,
+                type: document.getElementById('edit-workout-type').value,
+                difficulty: document.getElementById('edit-workout-difficulty').value,
+                duration: parseInt(document.getElementById('edit-workout-duration').value),
+                calories: parseInt(document.getElementById('edit-workout-calories').value),
+                equipment: selectedEquipment.length > 0 ? selectedEquipment : ['Bodyweight'],
+                exercises: exercises,
+                custom: true,
+                muscleGroups: selectedMuscleGroups.length > 0 ? selectedMuscleGroups : ['Full Body']
+            };
+
+            // Find and update the workout
+            const workoutIndex = customWorkouts.findIndex(w => w.id === workoutId);
+            if (workoutIndex !== -1) {
+                // Preserve AI generated flag if it exists
+                if (customWorkouts[workoutIndex].aiGenerated) {
+                    updatedWorkout.aiGenerated = true;
+                }
+                customWorkouts[workoutIndex] = updatedWorkout;
+                saveData();
+                closeModal('editModal');
+                if (currentTab === 'home') showHomeTab();
+                alert('✅ Workout updated successfully!');
+            }
+        }
+
         function resetProgress() {
             if (confirm('Reset all progress? This cannot be undone.')) {
                 userStats = { totalWorkouts: 0, totalTime: 0, streak: 0 };
@@ -848,41 +1138,54 @@
             }
         }
 
-        // AI Workout Generation
+        // AI Workout Generation with Exercise Prioritization
         function generateAIWorkout(preferences) {
             const exercises = [];
             const exerciseCount = Math.max(4, Math.min(8, Math.floor(preferences.duration / 5)));
             
-            // Get exercises based on muscle groups selected
-            let availableExercises = [];
+            // Get exercises based on muscle groups selected with prioritization
+            let primaryExercises = [];
+            let secondaryExercises = [];
+            
             if (preferences.muscleGroups && preferences.muscleGroups.length > 0) {
                 preferences.muscleGroups.forEach(muscle => {
                     if (exerciseDatabase[muscle]) {
-                        availableExercises = [...availableExercises, ...exerciseDatabase[muscle]];
+                        primaryExercises = [...primaryExercises, ...exerciseDatabase[muscle].primary];
+                        secondaryExercises = [...secondaryExercises, ...exerciseDatabase[muscle].secondary];
                     }
                 });
             } else {
-                availableExercises = exerciseDatabase['Full Body'];
+                primaryExercises = exerciseDatabase['Full Body'].primary;
+                secondaryExercises = exerciseDatabase['Full Body'].secondary;
             }
             
             // Remove duplicates
-            availableExercises = [...new Set(availableExercises)];
+            primaryExercises = [...new Set(primaryExercises)];
+            secondaryExercises = [...new Set(secondaryExercises)];
             
             // If still no exercises, use a basic set
-            if (availableExercises.length === 0) {
-                availableExercises = [
-                    'Push-ups', 'Squats', 'Lunges', 'Burpees', 'Mountain Climbers',
-                    'Plank', 'Jumping Jacks', 'High Knees', 'Russian Twists', 'Bicycle Crunches'
-                ];
+            if (primaryExercises.length === 0 && secondaryExercises.length === 0) {
+                primaryExercises = ['Push-ups', 'Squats', 'Pull-ups', 'Deadlifts'];
+                secondaryExercises = ['Lunges', 'Plank', 'Jumping Jacks', 'Russian Twists'];
             }
             
-            // Select random exercises
+            // Select exercises with prioritization: 60% primary (compound), 40% secondary (accessory)
             const selectedExercises = [];
-            const exercisePool = [...availableExercises];
+            const primaryCount = Math.ceil(exerciseCount * 0.6);
+            const secondaryCount = exerciseCount - primaryCount;
             
-            for (let i = 0; i < exerciseCount && exercisePool.length > 0; i++) {
-                const randomIndex = Math.floor(Math.random() * exercisePool.length);
-                selectedExercises.push(exercisePool.splice(randomIndex, 1)[0]);
+            // Select primary exercises first (compound movements)
+            const primaryPool = [...primaryExercises];
+            for (let i = 0; i < primaryCount && primaryPool.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * primaryPool.length);
+                selectedExercises.push(primaryPool.splice(randomIndex, 1)[0]);
+            }
+            
+            // Then select secondary exercises (accessory movements)
+            const secondaryPool = [...secondaryExercises];
+            for (let i = 0; i < secondaryCount && secondaryPool.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * secondaryPool.length);
+                selectedExercises.push(secondaryPool.splice(randomIndex, 1)[0]);
             }
 
             selectedExercises.forEach(exerciseName => {
@@ -1211,29 +1514,51 @@
             const selectedEquipment = Array.from(formData.getAll('equipment'));
             const selectedMuscleGroups = Array.from(formData.getAll('muscleGroups'));
             
-            // Generate exercises based on selected muscle groups
+            // Generate exercises based on selected muscle groups with prioritization
             let exercises = [];
             if (selectedMuscleGroups.length > 0) {
-                const exercisePool = [];
+                let primaryExercises = [];
+                let secondaryExercises = [];
+                
                 selectedMuscleGroups.forEach(muscle => {
                     if (exerciseDatabase[muscle]) {
-                        exercisePool.push(...exerciseDatabase[muscle]);
+                        primaryExercises = [...primaryExercises, ...exerciseDatabase[muscle].primary];
+                        secondaryExercises = [...secondaryExercises, ...exerciseDatabase[muscle].secondary];
                     }
                 });
                 
-                // Remove duplicates and select 4-6 exercises
-                const uniqueExercises = [...new Set(exercisePool)];
-                const exerciseCount = Math.min(6, Math.max(4, uniqueExercises.length));
+                // Remove duplicates
+                primaryExercises = [...new Set(primaryExercises)];
+                secondaryExercises = [...new Set(secondaryExercises)];
                 
-                for (let i = 0; i < exerciseCount && uniqueExercises.length > 0; i++) {
-                    const randomIndex = Math.floor(Math.random() * uniqueExercises.length);
-                    const exerciseName = uniqueExercises.splice(randomIndex, 1)[0];
+                // Select exercises with prioritization: start with compound movements
+                const exerciseCount = Math.min(6, Math.max(4, primaryExercises.length + secondaryExercises.length));
+                const primaryCount = Math.min(Math.ceil(exerciseCount * 0.6), primaryExercises.length);
+                const secondaryCount = exerciseCount - primaryCount;
+                
+                // Add primary exercises first
+                for (let i = 0; i < primaryCount && primaryExercises.length > 0; i++) {
+                    const randomIndex = Math.floor(Math.random() * primaryExercises.length);
+                    const exerciseName = primaryExercises.splice(randomIndex, 1)[0];
                     exercises.push({
                         name: exerciseName,
                         duration: 60,
+                        rest: 45,
+                        reps: '8-12',
+                        sets: 3
+                    });
+                }
+                
+                // Add secondary exercises
+                for (let i = 0; i < secondaryCount && secondaryExercises.length > 0; i++) {
+                    const randomIndex = Math.floor(Math.random() * secondaryExercises.length);
+                    const exerciseName = secondaryExercises.splice(randomIndex, 1)[0];
+                    exercises.push({
+                        name: exerciseName,
+                        duration: 45,
                         rest: 30,
                         reps: '10-15',
-                        sets: 1
+                        sets: 2
                     });
                 }
             }
@@ -1241,9 +1566,10 @@
             // If no muscle groups selected or no exercises found, use default exercises
             if (exercises.length === 0) {
                 exercises = [
-                    { name: 'Exercise 1', duration: 60, rest: 30, reps: '10-15', sets: 1 },
-                    { name: 'Exercise 2', duration: 45, rest: 30, reps: '8-12', sets: 1 },
-                    { name: 'Exercise 3', duration: 60, rest: 30, reps: '12-20', sets: 1 }
+                    { name: 'Push-ups', duration: 60, rest: 30, reps: '10-15', sets: 3 },
+                    { name: 'Squats', duration: 45, rest: 30, reps: '12-20', sets: 3 },
+                    { name: 'Plank', duration: 45, rest: 30, reps: null, sets: 2 },
+                    { name: 'Lunges', duration: 60, rest: 30, reps: '10 each leg', sets: 2 }
                 ];
             }
             
