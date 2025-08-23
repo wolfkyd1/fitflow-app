@@ -96,9 +96,7 @@
             width: 100%;
         }
         
-        .btn:hover {
-            background: #2563eb;
-        }
+        .btn:hover { background: #2563eb; }
         
         .btn-secondary {
             background: #6b7280;
@@ -332,6 +330,37 @@
             'Circuit Training', 'Endurance', 'Flexibility', 'Core'
         ];
 
+        const muscleGroups = [
+            'Full Body', 'Upper Body', 'Lower Body', 'Push (Chest/Shoulders/Triceps)', 
+            'Pull (Back/Biceps)', 'Legs', 'Chest', 'Back', 'Shoulders', 'Arms', 
+            'Biceps', 'Triceps', 'Core/Abs', 'Glutes', 'Quadriceps', 'Hamstrings', 
+            'Calves', 'Forearms', 'Traps', 'Lats'
+        ];
+
+        // Exercise database organized by muscle groups
+        const exerciseDatabase = {
+            'Full Body': ['Burpees', 'Thrusters', 'Man Makers', 'Turkish Get-ups', 'Mountain Climbers', 'Bear Crawls'],
+            'Upper Body': ['Push-ups', 'Pull-ups', 'Dips', 'Pike Push-ups', 'Handstand Push-ups'],
+            'Lower Body': ['Squats', 'Lunges', 'Jump Squats', 'Single Leg Deadlifts', 'Wall Sits', 'Calf Raises'],
+            'Push (Chest/Shoulders/Triceps)': ['Push-ups', 'Dumbbell Bench Press', 'Overhead Press', 'Dips', 'Tricep Extensions', 'Lateral Raises'],
+            'Pull (Back/Biceps)': ['Pull-ups', 'Bent-over Rows', 'Lat Pulldowns', 'Bicep Curls', 'Face Pulls', 'Reverse Flyes'],
+            'Legs': ['Squats', 'Deadlifts', 'Lunges', 'Leg Press', 'Calf Raises', 'Leg Curls', 'Leg Extensions'],
+            'Chest': ['Bench Press', 'Push-ups', 'Chest Flyes', 'Incline Press', 'Decline Press', 'Chest Dips'],
+            'Back': ['Deadlifts', 'Bent-over Rows', 'Pull-ups', 'Lat Pulldowns', 'T-Bar Rows', 'Cable Rows'],
+            'Shoulders': ['Overhead Press', 'Lateral Raises', 'Front Raises', 'Rear Delt Flyes', 'Upright Rows', 'Arnold Press'],
+            'Arms': ['Bicep Curls', 'Tricep Extensions', 'Hammer Curls', 'Close-Grip Push-ups', 'Tricep Dips', 'Preacher Curls'],
+            'Biceps': ['Bicep Curls', 'Hammer Curls', 'Preacher Curls', 'Cable Curls', 'Concentration Curls'],
+            'Triceps': ['Tricep Extensions', 'Close-Grip Push-ups', 'Tricep Dips', 'Overhead Tricep Press', 'Diamond Push-ups'],
+            'Core/Abs': ['Plank', 'Russian Twists', 'Bicycle Crunches', 'Dead Bug', 'Mountain Climbers', 'Leg Raises'],
+            'Glutes': ['Hip Thrusts', 'Glute Bridges', 'Bulgarian Split Squats', 'Clamshells', 'Fire Hydrants'],
+            'Quadriceps': ['Squats', 'Leg Extensions', 'Lunges', 'Jump Squats', 'Wall Sits', 'Step-ups'],
+            'Hamstrings': ['Romanian Deadlifts', 'Leg Curls', 'Good Mornings', 'Single Leg Deadlifts', 'Glute Ham Raises'],
+            'Calves': ['Calf Raises', 'Jump Rope', 'Jumping Jacks', 'Box Jumps', 'Pogo Jumps'],
+            'Forearms': ['Wrist Curls', 'Reverse Wrist Curls', 'Farmers Walks', 'Grip Squeezes', 'Plate Pinches'],
+            'Traps': ['Shrugs', 'Upright Rows', 'Face Pulls', 'High Pulls', 'Barbell Shrugs'],
+            'Lats': ['Pull-ups', 'Lat Pulldowns', 'T-Bar Rows', 'Wide-Grip Rows', 'Straight Arm Pulldowns']
+        };
+
         // Predefined workouts
         const predefinedWorkouts = [
             {
@@ -342,6 +371,7 @@
                 difficulty: "Beginner",
                 equipment: ["Bodyweight"],
                 calories: 150,
+                muscleGroups: ["Full Body"],
                 exercises: [
                     { name: "Jumping Jacks", duration: 45, rest: 15 },
                     { name: "Push-ups", duration: 30, rest: 15, reps: "8-12" },
@@ -358,6 +388,7 @@
                 difficulty: "Intermediate",
                 equipment: ["Dumbbells", "Bench"],
                 calories: 300,
+                muscleGroups: ["Upper Body"],
                 exercises: [
                     { name: "Dumbbell Bench Press", rest: 90, reps: "8-10", sets: 3 },
                     { name: "Bent-over Rows", rest: 90, reps: "8-10", sets: 3 },
@@ -373,6 +404,7 @@
                 difficulty: "Intermediate",
                 equipment: ["Bodyweight"],
                 calories: 100,
+                muscleGroups: ["Core/Abs"],
                 exercises: [
                     { name: "Plank", duration: 45, rest: 15 },
                     { name: "Russian Twists", duration: 30, rest: 15, reps: "20 each" },
@@ -388,6 +420,7 @@
                 difficulty: "Advanced",
                 equipment: ["Dumbbells", "Pull-up Bar"],
                 calories: 220,
+                muscleGroups: ["Chest", "Back", "Arms"],
                 exercises: [
                     { name: "Pull-ups", rest: 90, reps: "Max", sets: 3 },
                     { name: "Dumbbell Press", rest: 90, reps: "8-10", sets: 3 },
@@ -397,17 +430,18 @@
             },
             {
                 id: 5,
-                name: "HIIT Inferno",
-                type: "HIIT",
-                duration: 18,
+                name: "Leg Day Warrior",
+                type: "Strength Training",
+                duration: 40,
                 difficulty: "Advanced",
-                equipment: ["Kettlebells", "Medicine Ball"],
-                calories: 200,
+                equipment: ["Barbell", "Squat Rack"],
+                calories: 280,
+                muscleGroups: ["Legs", "Glutes"],
                 exercises: [
-                    { name: "Kettlebell Swings", duration: 30, rest: 15 },
-                    { name: "Medicine Ball Slams", duration: 30, rest: 15 },
-                    { name: "Burpees", duration: 30, rest: 15 },
-                    { name: "Jump Squats", duration: 30, rest: 60 }
+                    { name: "Back Squats", rest: 120, reps: "5-8", sets: 4 },
+                    { name: "Romanian Deadlifts", rest: 90, reps: "8-10", sets: 3 },
+                    { name: "Bulgarian Split Squats", rest: 60, reps: "10 each leg", sets: 3 },
+                    { name: "Calf Raises", rest: 45, reps: "15-20", sets: 3 }
                 ]
             }
         ];
@@ -483,12 +517,10 @@
         // Navigation
         function showTab(tab) {
             currentTab = tab;
-            // Update navigation active states
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Find and activate the correct nav item
             const navItems = document.querySelectorAll('.nav-item');
             if (tab === 'home' && navItems[0]) navItems[0].classList.add('active');
             if (tab === 'workout' && navItems[1]) navItems[1].classList.add('active');
@@ -527,27 +559,39 @@
                     </button>
                 </div>
 
-                <h3 style="margin-bottom: 16px; color: #1f2937;">Available Workouts</h3>
+                <h3 style="margin-bottom: 16px; color: #1f2937;">Available Workouts (${allWorkouts.length})</h3>
                 
-                ${allWorkouts.map(workout => `
-                    <div class="card">
-                        <div class="workout-title">
-                            ${workout.name}
-                            ${workout.aiGenerated ? ' 🤖' : ''}
-                            ${workout.custom ? ` <button onclick="deleteWorkout(${workout.id})" style="background: none; border: none; color: #ef4444; cursor: pointer;">🗑️</button>` : ''}
+                ${allWorkouts.map(workout => {
+                    const equipmentText = Array.isArray(workout.equipment) ? 
+                        workout.equipment.slice(0, 2).join(', ') + (workout.equipment.length > 2 ? '...' : '') :
+                        workout.equipment;
+                    const muscleText = workout.muscleGroups ? 
+                        workout.muscleGroups.slice(0, 2).join(', ') + (workout.muscleGroups.length > 2 ? '...' : '') : 
+                        'Full Body';
+                    
+                    return `
+                        <div class="card">
+                            <div class="workout-title">
+                                ${workout.name}
+                                ${workout.aiGenerated ? ' 🤖' : ''}
+                                ${workout.custom ? ` <button onclick="deleteWorkout(${workout.id})" style="background: none; border: none; color: #ef4444; cursor: pointer; float: right;">🗑️</button>` : ''}
+                            </div>
+                            <div class="workout-info">
+                                <div>🎯 ${workout.type}</div>
+                                <div>🕒 ${workout.duration}min</div>
+                                <div>💪 ${muscleText}</div>
+                                <div>🔥 ${workout.difficulty}</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">
+                                Equipment: ${equipmentText} • ~${workout.calories} cal • ${workout.exercises.length} exercises
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})">Details</button>
+                                <button class="btn" onclick="startWorkout(${workout.id})">Start</button>
+                            </div>
                         </div>
-                        <div class="workout-info">
-                            <div>🎯 ${workout.type}</div>
-                            <div>🕒 ${workout.duration}min</div>
-                            <div>💪 ${Array.isArray(workout.equipment) ? workout.equipment.join(', ') : workout.equipment}</div>
-                            <div>🔥 ${workout.difficulty}</div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})">Details</button>
-                            <button class="btn" onclick="startWorkout(${workout.id})">Start</button>
-                        </div>
-                    </div>
-                `).join('')}
+                    `;
+                }).join('')}
             `;
         }
 
@@ -809,20 +853,36 @@
             const exercises = [];
             const exerciseCount = Math.max(4, Math.min(8, Math.floor(preferences.duration / 5)));
             
-            const exerciseNames = [
-                'Push-ups', 'Squats', 'Lunges', 'Burpees', 'Mountain Climbers',
-                'Plank', 'Jumping Jacks', 'High Knees', 'Russian Twists', 'Bicycle Crunches',
-                'Dumbbell Press', 'Bent-over Rows', 'Overhead Press', 'Deadlifts',
-                'Kettlebell Swings', 'Medicine Ball Slams', 'Battle Ropes', 'Box Jumps'
-            ];
+            // Get exercises based on muscle groups selected
+            let availableExercises = [];
+            if (preferences.muscleGroups && preferences.muscleGroups.length > 0) {
+                preferences.muscleGroups.forEach(muscle => {
+                    if (exerciseDatabase[muscle]) {
+                        availableExercises = [...availableExercises, ...exerciseDatabase[muscle]];
+                    }
+                });
+            } else {
+                availableExercises = exerciseDatabase['Full Body'];
+            }
+            
+            // Remove duplicates
+            availableExercises = [...new Set(availableExercises)];
+            
+            // If still no exercises, use a basic set
+            if (availableExercises.length === 0) {
+                availableExercises = [
+                    'Push-ups', 'Squats', 'Lunges', 'Burpees', 'Mountain Climbers',
+                    'Plank', 'Jumping Jacks', 'High Knees', 'Russian Twists', 'Bicycle Crunches'
+                ];
+            }
             
             // Select random exercises
             const selectedExercises = [];
-            const availableExercises = [...exerciseNames];
+            const exercisePool = [...availableExercises];
             
-            for (let i = 0; i < exerciseCount && availableExercises.length > 0; i++) {
-                const randomIndex = Math.floor(Math.random() * availableExercises.length);
-                selectedExercises.push(availableExercises.splice(randomIndex, 1)[0]);
+            for (let i = 0; i < exerciseCount && exercisePool.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * exercisePool.length);
+                selectedExercises.push(exercisePool.splice(randomIndex, 1)[0]);
             }
 
             selectedExercises.forEach(exerciseName => {
@@ -835,10 +895,17 @@
                         exercise.rest = 15 + Math.floor(Math.random() * 15);
                         break;
                     case 'Strength Training':
+                    case 'Powerlifting':
+                    case 'Bodybuilding':
                         exercise.reps = preferences.difficulty === 'Beginner' ? '8-12' : 
                                      preferences.difficulty === 'Advanced' ? '5-8' : '6-10';
                         exercise.sets = 3;
                         exercise.rest = 60 + Math.floor(Math.random() * 60);
+                        break;
+                    case 'Yoga':
+                    case 'Flexibility':
+                        exercise.duration = 60 + Math.floor(Math.random() * 60);
+                        exercise.rest = 15;
                         break;
                     default:
                         exercise.duration = 45;
@@ -855,9 +922,15 @@
                            (preferences.difficulty === 'Advanced' ? 1.2 : 
                             preferences.difficulty === 'Beginner' ? 0.8 : 1));
 
+            // Create muscle group name for workout
+            const muscleGroupName = preferences.muscleGroups && preferences.muscleGroups.length > 0 ? 
+                preferences.muscleGroups.length === 1 ? preferences.muscleGroups[0] : 
+                preferences.muscleGroups.length <= 2 ? preferences.muscleGroups.join(' & ') : 
+                'Multi-Muscle' : 'Full Body';
+
             return {
                 id: Date.now(),
-                name: `AI ${preferences.type} Workout`,
+                name: `AI ${muscleGroupName} ${preferences.type}`,
                 type: preferences.type,
                 duration: preferences.duration,
                 difficulty: preferences.difficulty,
@@ -865,117 +938,158 @@
                 calories,
                 exercises,
                 custom: true,
-                aiGenerated: true
+                aiGenerated: true,
+                muscleGroups: preferences.muscleGroups || ['Full Body']
             };
         }
 
         // Modals
         function showAIWorkoutModal() {
-            document.body.innerHTML += `
-                <div class="modal" id="aiModal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>🤖 AI Workout Generator</h3>
-                            <button class="close-btn" onclick="closeModal('aiModal')">&times;</button>
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'aiModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>🤖 AI Workout Generator</h3>
+                        <button class="close-btn" onclick="closeModal('aiModal')">&times;</button>
+                    </div>
+                    <form id="aiWorkoutForm">
+                        <div class="form-group">
+                            <label class="form-label">Workout Type</label>
+                            <select id="ai-type" class="form-select" required>
+                                ${workoutTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                            </select>
                         </div>
-                        <form onsubmit="handleAIWorkout(event)">
+                        <div class="form-group">
+                            <label class="form-label">Target Muscle Groups</label>
+                            <div class="equipment-list">
+                                ${muscleGroups.map(muscle => `
+                                    <div class="equipment-item">
+                                        <input type="checkbox" name="muscleGroups" value="${muscle}" id="ai-muscle-${muscle.replace(/[^a-zA-Z0-9]/g, '')}">
+                                        <label for="ai-muscle-${muscle.replace(/[^a-zA-Z0-9]/g, '')}">${muscle}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Available Equipment</label>
+                            <div class="equipment-list">
+                                ${equipmentOptions.map(equipment => `
+                                    <div class="equipment-item">
+                                        <input type="checkbox" name="equipment" value="${equipment}" id="ai-${equipment.replace(/[^a-zA-Z0-9]/g, '')}">
+                                        <label for="ai-${equipment.replace(/[^a-zA-Z0-9]/g, '')}">${equipment}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                             <div class="form-group">
-                                <label class="form-label">Workout Type</label>
-                                <select id="ai-type" class="form-select" required>
+                                <label class="form-label">Duration (min)</label>
+                                <input type="number" id="ai-duration" class="form-input" min="5" max="120" value="30" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Difficulty</label>
+                                <select id="ai-difficulty" class="form-select">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate" selected>Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="background: #6366f1;">
+                            🤖 Generate AI Workout
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener
+            document.getElementById('aiWorkoutForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleAIWorkout();
+            });
+        }
+
+        function showCreateWorkoutModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'createModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📝 Create Custom Workout</h3>
+                        <button class="close-btn" onclick="closeModal('createModal')">&times;</button>
+                    </div>
+                    <form id="createWorkoutForm">
+                        <div class="form-group">
+                            <label class="form-label">Workout Name</label>
+                            <input type="text" id="workout-name" class="form-input" placeholder="My Custom Workout" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select id="workout-type" class="form-select">
                                     ${workoutTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Available Equipment</label>
-                                <div class="equipment-list">
-                                    ${equipmentOptions.map(equipment => `
-                                        <div class="equipment-item">
-                                            <input type="checkbox" name="equipment" value="${equipment}" id="ai-${equipment}">
-                                            <label for="ai-${equipment}">${equipment}</label>
-                                        </div>
-                                    `).join('')}
-                                </div>
+                                <label class="form-label">Difficulty</label>
+                                <select id="workout-difficulty" class="form-select">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <div class="form-group">
-                                    <label class="form-label">Duration (min)</label>
-                                    <input type="number" id="ai-duration" class="form-input" min="5" max="120" value="30" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Difficulty</label>
-                                    <select id="ai-difficulty" class="form-select">
-                                        <option value="Beginner">Beginner</option>
-                                        <option value="Intermediate" selected>Intermediate</option>
-                                        <option value="Advanced">Advanced</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn" style="background: #6366f1;">
-                                🤖 Generate AI Workout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        }
-
-        function showCreateWorkoutModal() {
-            document.body.innerHTML += `
-                <div class="modal" id="createModal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>📝 Create Custom Workout</h3>
-                            <button class="close-btn" onclick="closeModal('createModal')">&times;</button>
                         </div>
-                        <form onsubmit="handleCreateWorkout(event)">
+                        <div class="form-group">
+                            <label class="form-label">Target Muscle Groups</label>
+                            <div class="equipment-list">
+                                ${muscleGroups.map(muscle => `
+                                    <div class="equipment-item">
+                                        <input type="checkbox" name="muscleGroups" value="${muscle}" id="create-muscle-${muscle.replace(/[^a-zA-Z0-9]/g, '')}">
+                                        <label for="create-muscle-${muscle.replace(/[^a-zA-Z0-9]/g, '')}">${muscle}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                             <div class="form-group">
-                                <label class="form-label">Workout Name</label>
-                                <input type="text" id="workout-name" class="form-input" placeholder="My Custom Workout" required>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <div class="form-group">
-                                    <label class="form-label">Type</label>
-                                    <select id="workout-type" class="form-select">
-                                        ${workoutTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Difficulty</label>
-                                    <select id="workout-difficulty" class="form-select">
-                                        <option value="Beginner">Beginner</option>
-                                        <option value="Intermediate">Intermediate</option>
-                                        <option value="Advanced">Advanced</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <div class="form-group">
-                                    <label class="form-label">Duration (min)</label>
-                                    <input type="number" id="workout-duration" class="form-input" min="1" value="30" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Est. Calories</label>
-                                    <input type="number" id="workout-calories" class="form-input" min="1" value="200" required>
-                                </div>
+                                <label class="form-label">Duration (min)</label>
+                                <input type="number" id="workout-duration" class="form-input" min="1" value="30" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Equipment Needed</label>
-                                <div class="equipment-list">
-                                    ${equipmentOptions.map(equipment => `
-                                        <div class="equipment-item">
-                                            <input type="checkbox" name="equipment" value="${equipment}" id="create-${equipment}">
-                                            <label for="create-${equipment}">${equipment}</label>
-                                        </div>
-                                    `).join('')}
-                                </div>
+                                <label class="form-label">Est. Calories</label>
+                                <input type="number" id="workout-calories" class="form-input" min="1" value="200" required>
                             </div>
-                            <button type="submit" class="btn" style="background: #a855f7;">
-                                📝 Create Workout Template
-                            </button>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Equipment Needed</label>
+                            <div class="equipment-list">
+                                ${equipmentOptions.map(equipment => `
+                                    <div class="equipment-item">
+                                        <input type="checkbox" name="equipment" value="${equipment}" id="create-${equipment.replace(/[^a-zA-Z0-9]/g, '')}">
+                                        <label for="create-${equipment.replace(/[^a-zA-Z0-9]/g, '')}">${equipment}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="background: #a855f7;">
+                            📝 Create Workout Template
+                        </button>
+                    </form>
                 </div>
             `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener
+            document.getElementById('createWorkoutForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleCreateWorkout();
+            });
         }
 
         function showWorkoutDetails(id) {
@@ -984,68 +1098,79 @@
             if (!workout) return;
 
             const equipmentArray = Array.isArray(workout.equipment) ? workout.equipment : [workout.equipment];
+            const muscleGroupsArray = workout.muscleGroups || ['Full Body'];
             
-            document.body.innerHTML += `
-                <div class="modal" id="detailsModal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>${workout.name} ${workout.aiGenerated ? '🤖' : ''}</h3>
-                            <button class="close-btn" onclick="closeModal('detailsModal')">&times;</button>
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'detailsModal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>${workout.name} ${workout.aiGenerated ? '🤖' : ''}</h3>
+                        <button class="close-btn" onclick="closeModal('detailsModal')">&times;</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                        <div style="background: #eff6ff; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="color: #2563eb; font-weight: bold;">${workout.type}</div>
+                            <div style="color: #6b7280; font-size: 12px;">Type</div>
                         </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                            <div style="background: #eff6ff; padding: 12px; border-radius: 8px; text-align: center;">
-                                <div style="color: #2563eb; font-weight: bold;">${workout.type}</div>
-                                <div style="color: #6b7280; font-size: 12px;">Type</div>
-                            </div>
-                            <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center;">
-                                <div style="color: #16a34a; font-weight: bold;">${workout.duration}min</div>
-                                <div style="color: #6b7280; font-size: 12px;">Duration</div>
-                            </div>
-                            <div style="background: #faf5ff; padding: 12px; border-radius: 8px; text-align: center;">
-                                <div style="color: #9333ea; font-weight: bold;">${workout.difficulty}</div>
-                                <div style="color: #6b7280; font-size: 12px;">Level</div>
-                            </div>
-                            <div style="background: #fff7ed; padding: 12px; border-radius: 8px; text-align: center;">
-                                <div style="color: #ea580c; font-weight: bold;">${workout.calories}</div>
-                                <div style="color: #6b7280; font-size: 12px;">Calories</div>
-                            </div>
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="color: #16a34a; font-weight: bold;">${workout.duration}min</div>
+                            <div style="color: #6b7280; font-size: 12px;">Duration</div>
                         </div>
+                        <div style="background: #faf5ff; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="color: #9333ea; font-weight: bold;">${workout.difficulty}</div>
+                            <div style="color: #6b7280; font-size: 12px;">Level</div>
+                        </div>
+                        <div style="background: #fff7ed; padding: 12px; border-radius: 8px; text-align: center;">
+                            <div style="color: #ea580c; font-weight: bold;">${workout.calories}</div>
+                            <div style="color: #6b7280; font-size: 12px;">Calories</div>
+                        </div>
+                    </div>
 
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="margin-bottom: 8px;">Equipment Needed</h4>
-                            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                ${equipmentArray.map(equipment => `
-                                    <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 12px; font-size: 12px;">${equipment}</span>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <h4 style="margin-bottom: 12px;">Exercises (${workout.exercises.length})</h4>
-                        <div style="max-height: 200px; overflow-y: auto;">
-                            ${workout.exercises.map((exercise, index) => `
-                                <div style="background: #f9fafb; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                        <h5 style="margin: 0; font-size: 14px;">${exercise.name}</h5>
-                                        <span style="background: white; color: #6b7280; padding: 2px 6px; border-radius: 10px; font-size: 10px;">#${index + 1}</span>
-                                    </div>
-                                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                        ${exercise.duration ? `<span style="background: #dbeafe; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.duration}s</span>` : ''}
-                                        ${exercise.reps ? `<span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.reps}</span>` : ''}
-                                        ${exercise.sets && exercise.sets > 1 ? `<span style="background: #e9d5ff; color: #7c3aed; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.sets} sets</span>` : ''}
-                                        ${exercise.rest > 0 ? `<span style="background: #fed7aa; color: #c2410c; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.rest}s rest</span>` : ''}
-                                    </div>
-                                </div>
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 8px;">Target Muscle Groups</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                            ${muscleGroupsArray.map(muscle => `
+                                <span style="background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 12px; font-size: 12px;">💪 ${muscle}</span>
                             `).join('')}
                         </div>
                         
-                        <div style="display: flex; gap: 12px; margin-top: 20px;">
-                            <button class="btn btn-secondary" onclick="closeModal('detailsModal')">Close</button>
-                            <button class="btn" onclick="startWorkout(${workout.id}); closeModal('detailsModal');">Start Workout</button>
+                        <h4 style="margin-bottom: 8px;">Equipment Needed</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            ${equipmentArray.map(equipment => `
+                                <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 12px; font-size: 12px;">${equipment}</span>
+                            `).join('')}
                         </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 12px;">Exercises (${workout.exercises.length})</h4>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        ${workout.exercises.map((exercise, index) => `
+                            <div style="background: #f9fafb; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <h5 style="margin: 0; font-size: 14px;">${exercise.name}</h5>
+                                    <span style="background: white; color: #6b7280; padding: 2px 6px; border-radius: 10px; font-size: 10px;">#${index + 1}</span>
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                    ${exercise.duration ? `<span style="background: #dbeafe; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.duration}s</span>` : ''}
+                                    ${exercise.reps ? `<span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.reps}</span>` : ''}
+                                    ${exercise.sets && exercise.sets > 1 ? `<span style="background: #e9d5ff; color: #7c3aed; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.sets} sets</span>` : ''}
+                                    ${exercise.rest > 0 ? `<span style="background: #fed7aa; color: #c2410c; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${exercise.rest}s rest</span>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="closeModal('detailsModal')">Close</button>
+                        <button class="btn" onclick="startWorkout(${workout.id}); closeModal('detailsModal');">Start Workout</button>
                     </div>
                 </div>
             `;
+            
+            document.body.appendChild(modal);
         }
 
         function closeModal(modalId) {
@@ -1053,14 +1178,18 @@
             if (modal) modal.remove();
         }
 
-        function handleAIWorkout(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
+        function handleAIWorkout() {
+            const form = document.getElementById('aiWorkoutForm');
+            if (!form) return;
+            
+            const formData = new FormData(form);
             const selectedEquipment = Array.from(formData.getAll('equipment'));
+            const selectedMuscleGroups = Array.from(formData.getAll('muscleGroups'));
             
             const preferences = {
                 type: document.getElementById('ai-type').value,
                 equipment: selectedEquipment.length > 0 ? selectedEquipment : ['Bodyweight'],
+                muscleGroups: selectedMuscleGroups,
                 duration: parseInt(document.getElementById('ai-duration').value),
                 difficulty: document.getElementById('ai-difficulty').value
             };
@@ -1070,12 +1199,53 @@
             saveData();
             closeModal('aiModal');
             if (currentTab === 'home') showHomeTab();
+            
+            alert('🎉 AI Workout Generated! Check it out in your workout list.');
         }
 
-        function handleCreateWorkout(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
+        function handleCreateWorkout() {
+            const form = document.getElementById('createWorkoutForm');
+            if (!form) return;
+            
+            const formData = new FormData(form);
             const selectedEquipment = Array.from(formData.getAll('equipment'));
+            const selectedMuscleGroups = Array.from(formData.getAll('muscleGroups'));
+            
+            // Generate exercises based on selected muscle groups
+            let exercises = [];
+            if (selectedMuscleGroups.length > 0) {
+                const exercisePool = [];
+                selectedMuscleGroups.forEach(muscle => {
+                    if (exerciseDatabase[muscle]) {
+                        exercisePool.push(...exerciseDatabase[muscle]);
+                    }
+                });
+                
+                // Remove duplicates and select 4-6 exercises
+                const uniqueExercises = [...new Set(exercisePool)];
+                const exerciseCount = Math.min(6, Math.max(4, uniqueExercises.length));
+                
+                for (let i = 0; i < exerciseCount && uniqueExercises.length > 0; i++) {
+                    const randomIndex = Math.floor(Math.random() * uniqueExercises.length);
+                    const exerciseName = uniqueExercises.splice(randomIndex, 1)[0];
+                    exercises.push({
+                        name: exerciseName,
+                        duration: 60,
+                        rest: 30,
+                        reps: '10-15',
+                        sets: 1
+                    });
+                }
+            }
+            
+            // If no muscle groups selected or no exercises found, use default exercises
+            if (exercises.length === 0) {
+                exercises = [
+                    { name: 'Exercise 1', duration: 60, rest: 30, reps: '10-15', sets: 1 },
+                    { name: 'Exercise 2', duration: 45, rest: 30, reps: '8-12', sets: 1 },
+                    { name: 'Exercise 3', duration: 60, rest: 30, reps: '12-20', sets: 1 }
+                ];
+            }
             
             const workoutData = {
                 id: Date.now(),
@@ -1085,18 +1255,17 @@
                 duration: parseInt(document.getElementById('workout-duration').value),
                 calories: parseInt(document.getElementById('workout-calories').value),
                 equipment: selectedEquipment.length > 0 ? selectedEquipment : ['Bodyweight'],
-                exercises: [
-                    { name: 'Exercise 1', duration: 60, rest: 30, reps: '10-15', sets: 1 },
-                    { name: 'Exercise 2', duration: 45, rest: 30, reps: '8-12', sets: 1 },
-                    { name: 'Exercise 3', duration: 60, rest: 30, reps: '12-20', sets: 1 }
-                ],
-                custom: true
+                exercises: exercises,
+                custom: true,
+                muscleGroups: selectedMuscleGroups.length > 0 ? selectedMuscleGroups : ['Full Body']
             };
             
             customWorkouts.unshift(workoutData);
             saveData();
             closeModal('createModal');
             if (currentTab === 'home') showHomeTab();
+            
+            alert('✅ Custom Workout Created! You can now start your workout.');
         }
 
         // Initialize app when page loads
