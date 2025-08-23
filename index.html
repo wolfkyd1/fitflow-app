@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FitFlow">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2563eb">
+    <title>FitFlow - Your Personal Workout Companion</title>
+    
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Utility Classes */
+        .container { max-width: 28rem; margin: 0 auto; }
+        .relative { position: relative; }
+        .fixed { position: fixed; }
+        .absolute { position: absolute; }
+        .sticky { position: sticky; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .top-0 { top: 0; }
+        .bottom-0 { bottom: 0; }
+        .left-1\/2 { left: 50%; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-50 { z-index: 50; }
+        
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-1 { flex: 1 1 0%; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+        
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        
+        .p-1 { padding: 0.25rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .pb-20 { padding-bottom: 5rem; }
+        .pb-32 { padding-bottom: 8rem; }
+        .pt-4 { padding-top: 1rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mr-1 { margin-right: 0.25rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .mr-3 { margin-right: 0.75rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        
+        .w-full { width: 100%; }
+        .w-10 { width: 2.5rem; }
+        .w-40 { width: 10rem; }
+        .h-3 { height: 0.75rem; }
+        .h-full { height: 100%; }
+        .max-w-md { max-width: 28rem; }
+        .max-h-60 { max-height: 15rem; }
+        .max-h-80vh { max-height: 80vh; }
+        .min-h-44 { min-height: 2.75rem; }
+        .min-w-44 { min-width: 2.75rem; }
+        
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        
+        .rounded { border-radius: 0.25rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-full { border-radius: 9999px; }
+        
+        .border { border-width: 1px; border-color: #d1d5db; }
+        .border-t { border-top-width: 1px; border-top-color: #d1d5db; }
+        .border-b { border-bottom-width: 1px; border-bottom-color: #d1d5db; }
+        .border-l-4 { border-left-width: 4px; }
+        
+        .bg-white { background-color: #ffffff; }
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-gray-200 { background-color: #e5e7eb; }
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-blue-100 { background-color: #dbeafe; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-green-50 { background-color: #f0fdf4; }
+        .bg-green-100 { background-color: #dcfce7; }
+        .bg-green-500 { background-color: #22c55e; }
+        .bg-green-600 { background-color: #16a34a; }
+        .bg-purple-50 { background-color: #faf5ff; }
+        .bg-purple-100 { background-color: #e9d5ff; }
+        .bg-purple-500 { background-color: #a855f7; }
+        .bg-purple-600 { background-color: #9333ea; }
+        .bg-orange-50 { background-color: #fff7ed; }
+        .bg-orange-100 { background-color: #fed7aa; }
+        .bg-orange-500 { background-color: #f97316; }
+        .bg-orange-600 { background-color: #ea580c; }
+        .bg-red-50 { background-color: #fef2f2; }
+        .bg-red-500 { background-color: #ef4444; }
+        .bg-black { background-color: #000000; }
+        .bg-opacity-20 { background-color: rgba(255, 255, 255, 0.2); }
+        .bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+        
+        .text-white { color: #ffffff; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-700 { color: #374151; }
+        .text-gray-800 { color: #1f2937; }
+        .text-blue-600 { color: #2563eb; }
+        .text-blue-700 { color: #1d4ed8; }
+        .text-green-600 { color: #16a34a; }
+        .text-green-700 { color: #15803d; }
+        .text-purple-600 { color: #9333ea; }
+        .text-purple-700 { color: #7c3aed; }
+        .text-orange-600 { color: #ea580c; }
+        .text-orange-700 { color: #c2410c; }
+        .text-red-500 { color: #ef4444; }
+        .text-red-600 { color: #dc2626; }
+        
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-6xl { font-size: 3.75rem; line-height: 1; }
+        
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        
+        .transform { transform: translateX(-50%); }
+        
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-x-4 > * + * { margin-left: 1rem; }
+        
+        .transition-colors { transition-property: color, background-color, border-color; transition-duration: 150ms; }
+        .transition-all { transition: all 0.3s ease; }
+        
+        .opacity-90 { opacity: 0.9; }
+        
+        .inline-block { display: inline-block; }
+        
+        /* Gradients */
+        .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+        .from-blue-500 { --tw-gradient-from: #3b82f6; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(59, 130, 246, 0)); }
+        .from-blue-600 { --tw-gradient-from: #2563eb; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(37, 99, 235, 0)); }
+        .from-green-500 { --tw-gradient-from: #22c55e; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(34, 197, 94, 0)); }
+        .from-purple-500 { --tw-gradient-from: #a855f7; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(168, 85, 247, 0)); }
+        .to-blue-600 { --tw-gradient-to: #2563eb; }
+        .to-blue-700 { --tw-gradient-to: #1d4ed8; }
+        .to-green-600 { --tw-gradient-to: #16a34a; }
+        .to-purple-600 { --tw-gradient-to: #9333ea; }
+        
+        /* Custom styles */
+        .border-blue-500 { border-color: #3b82f6; }
+        .border-gray-200 { border-color: #e5e7eb; }
+        
+        /* Hover states */
+        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+        .hover\:bg-gray-200:hover { background-color: #e5e7eb; }
+        .hover\:bg-gray-300:hover { background-color: #d1d5db; }
+        .hover\:bg-blue-50:hover { background-color: #eff6ff; }
+        .hover\:bg-blue-600:hover { background-color: #2563eb; }
+        .hover\:bg-green-600:hover { background-color: #16a34a; }
+        .hover\:bg-orange-600:hover { background-color: #ea580c; }
+        .hover\:bg-red-50:hover { background-color: #fef2f2; }
+        .hover\:text-blue-600:hover { color: #2563eb; }
+        .hover\:text-gray-700:hover { color: #374151; }
+        .hover\:text-red-600:hover { color: #dc2626; }
+        
+        /* Safe area support */
+        .safe-area-top { padding-top: env(safe-area-inset-top); }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .header-with-notch { padding-top: max(env(safe-area-inset-top), 20px); }
+        .bottom-nav-with-home-indicator { padding-bottom: max(env(safe-area-inset-bottom), 12px); }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .haptic-feedback { animation: hapticPulse 0.1s ease-in-out; }
+        @keyframes hapticPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+        }
+        
+        /* Form elements */
+        input, select, textarea {
+            font-size: 16px;
+            -webkit-appearance: none;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            outline: none;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Buttons */
+        button {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            outline: none;
+            -webkit-appearance: none;
+            border-radius: 12px;
+            min-height: 44px;
+            min-width: 44px;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+        
+        /* App container */
+        #app-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .scrollable-content {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            height: 100%;
+        }
+        
+        /* Loading state */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Hide loading initially */
+        .loaded #loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Loading FitFlow...</p>
+    </div>
+    <div id="root"></div>
+
+    <script>
+        // Prevent default iOS behaviors
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Prevent zoom on double tap
+        let lastTap = 0;
+        document.addEventListener('touchstart', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 500 && tapLength > 0) {
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        });
+
+        // iOS Haptic Feedback
+        function triggerHapticFeedback(type) {
+            if (navigator.vibrate) {
+                switch(type) {
+                    case 'light': navigator.vibrate(10); break;
+                    case 'medium': navigator.vibrate(20); break;
+                    case 'heavy': navigator.vibrate([30]); break;
+                    default: navigator.vibrate(10);
+                }
+            }
+        }
+
+        // Simple Icon Component
+        function Icon(name, size, className) {
+            size = size || 20;
+            className = className || "";
+            
+            const icons = {
+                play: "▶",
+                pause: "⏸",
+                home: "🏠",
+                user: "👤",
+                plus: "➕",
+                clock: "🕒",
+                target: "🎯",
+                dumbbell: "💪",
+                fire: "🔥",
+                check: "✅",
+                x: "❌",
+                edit: "✏️",
+                trash: "🗑️",
+                filter: "🔽",
+                save: "💾",
+                reset: "🔄",
+                settings: "⚙️",
+                trophy: "🏆",
+                heart: "❤️",
+                stats: "📊"
+            };
+            
+            return '<span class="inline-block ' + className + '" style="font-size: ' + size + 'px">' + (icons[name] || "●") + '</span>';
+        }
+
+        // Main App Class
+        class WorkoutApp {
+            constructor() {
+                this.activeTab = 'home';
+                this.workouts = [];
+                this.customWorkouts = [];
+                this.currentWorkout = null;
+                this.workoutInProgress = false;
+                this.currentExercise = 0;
+                this.timer = 0;
+                this.isTimerRunning = false;
+                this.restTimer = 0;
+                this.isResting = false;
+                this.workoutHistory = [];
+                this.filters = {
+                    type: 'all',
+                    equipment: 'all',
+                    duration: 'all',
+                    difficulty: 'all'
+                };
+                this.showCreateWorkout = false;
+                this.editingWorkout = null;
+                this.showWorkoutDetails = null;
+                this.userStats = {
+                    totalWorkouts: 0,
+                    totalTime: 0,
+                    streak: 0,
+                    favoriteType: 'Strength'
+                };
+
+                this.timerInterval = null;
+                this.restTimerInterval = null;
+
+                // Predefined workouts
+                this.predefinedWorkouts = [
+                    {
+                        id: 1,
+                        name: "Morning Energy Blast",
+                        type: "HIIT",
+                        duration: 15,
+                        difficulty: "Beginner",
+                        equipment: "Bodyweight",
+                        calories: 150,
+                        exercises: [
+                            { name: "Jumping Jacks", duration: 45, rest: 15, reps: null },
+                            { name: "Push-ups", duration: 30, rest: 15, reps: "8-12" },
+                            { name: "Squats", duration: 45, rest: 15, reps: "12-15" },
+                            { name: "Mountain Climbers", duration: 30, rest: 15, reps: null },
+                            { name: "Plank", duration: 30, rest: 60, reps: null }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "Strength Builder",
+                        type: "Strength",
+                        duration: 45,
+                        difficulty: "Intermediate",
+                        equipment: "Dumbbells",
+                        calories: 300,
+                        exercises: [
+                            { name: "Dumbbell Bench Press", duration: null, rest: 90, reps: "8-10", sets: 3 },
+                            { name: "Bent-over Rows", duration: null, rest: 90, reps: "8-10", sets: 3 },
+                            { name: "Overhead Press", duration: null, rest: 90, reps: "6-8", sets: 3 },
+                            { name: "Dumbbell Squats", duration: null, rest: 90, reps: "10-12", sets: 3 },
+                            { name: "Romanian Deadlifts", duration: null, rest: 90, reps: "8-10", sets: 3 }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "Zen Flow Yoga",
+                        type: "Yoga",
+                        duration: 30,
+                        difficulty: "Beginner",
+                        equipment: "Yoga Mat",
+                        calories: 120,
+                        exercises: [
+                            { name: "Sun Salutation A", duration: 120, rest: 30, reps: "3 rounds" },
+                            { name: "Warrior I Flow", duration: 90, rest: 15, reps: "Each side" },
+                            { name: "Triangle Pose", duration: 60, rest: 15, reps: "Each side" },
+                            { name: "Seated Forward Fold", duration: 90, rest: 30, reps: null },
+                            { name: "Corpse Pose", duration: 300, rest: 0, reps: null }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "Cardio Crusher",
+                        type: "Cardio",
+                        duration: 25,
+                        difficulty: "Advanced",
+                        equipment: "Bodyweight",
+                        calories: 250,
+                        exercises: [
+                            { name: "Burpees", duration: 20, rest: 10, reps: null },
+                            { name: "High Knees", duration: 20, rest: 10, reps: null },
+                            { name: "Jump Squats", duration: 20, rest: 10, reps: null },
+                            { name: "Sprint in Place", duration: 20, rest: 10, reps: null },
+                            { name: "Rest", duration: 60, rest: 0, reps: null }
+                        ]
+                    },
+                    {
+                        id: 5,
+                        name: "Core Crusher",
+                        type: "Core",
+                        duration: 20,
+                        difficulty: "Intermediate",
+                        equipment: "Bodyweight",
+                        calories: 100,
+                        exercises: [
+                            { name: "Plank", duration: 45, rest: 15, reps: null },
+                            { name: "Russian Twists", duration: 30, rest: 15, reps: "20 each side" },
+                            { name: "Bicycle Crunches", duration: 30, rest: 15, reps: "15 each side" },
+                            { name: "Dead Bug", duration: 45, rest: 15, reps: "10 each side" },
+                            { name: "Side Plank", duration: 30, rest: 15, reps: "Each side" }
+                        ]
+                    }
+                ];
+
+                this.init();
+            }
+
+            init() {
+                // Load saved data
+                this.loadData();
+                
+                // Set workouts
+                this.workouts = this.predefinedWorkouts;
+                
+                // Render initial view
+                this.render();
+                
+                // Hide loading
+                document.body.classList.add('loaded');
+                
+                // Start timer loops
+                this.startTimerLoop();
+                this.startRestTimerLoop();
+            }
+
+            loadData() {
+                try {
+                    const savedHistory = sessionStorage.getItem('fitflow-workout-history');
+                    const savedStats = sessionStorage.getItem('fitflow-user-stats');
+                    const savedCustomWorkouts = sessionStorage.getItem('fitflow-custom-workouts');
+                    
+                    if (savedHistory) {
+                        this.workoutHistory = JSON.parse(savedHistory);
+                    }
+                    
+                    if (savedStats) {
+                        this.userStats = JSON.parse(savedStats);
+                    }
+                    
+                    if (savedCustomWorkouts) {
+                        this.customWorkouts = JSON.parse(savedCustomWorkouts);
+                    }
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                }
+            }
+
+            saveData() {
+                try {
+                    sessionStorage.setItem('fitflow-workout-history', JSON.stringify(this.workoutHistory));
+                    sessionStorage.setItem('fitflow-user-stats', JSON.stringify(this.userStats));
+                    sessionStorage.setItem('fitflow-custom-workouts', JSON.stringify(this.customWorkouts));
+                } catch (e) {
+                    console.error('Error saving data:', e);
+                }
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            startTimerLoop() {
+                setInterval(() => {
+                    if (this.isTimerRunning && this.workoutInProgress && !this.isResting) {
+                        this.timer++;
+                        this.updateTimerDisplay();
+                    }
+                }, 1000);
+            }
+
+            startRestTimerLoop() {
+                setInterval(() => {
+                    if (this.isResting && this.restTimer > 0) {
+                        this.restTimer--;
+                        if (this.restTimer <= 0) {
+                            this.isResting = false;
+                            this.isTimerRunning = true;
+                            triggerHapticFeedback('medium');
+                            this.render();
+                        }
+                        this.updateRestTimerDisplay();
+                    }
+                }, 1000);
+            }
+
+            updateTimerDisplay() {
+                const timerDisplay = document.querySelector('.timer-display');
+                if (timerDisplay) {
+                    timerDisplay.textContent = this.formatTime(this.timer);
+                }
+            }
+
+            updateRestTimerDisplay() {
+                const restTimerDisplay = document.querySelector('.rest-timer-display');
+                if (restTimerDisplay) {
+                    restTimerDisplay.textContent = this.formatTime(this.restTimer);
+                }
+            }
+
+            startWorkout(workout) {
+                triggerHapticFeedback('light');
+                this.currentWorkout = workout;
+                this.currentExercise = 0;
+                this.workoutInProgress = true;
+                this.timer = 0;
+                this.isTimerRunning = true;
+                this.activeTab = 'workout';
+                this.render();
+            }
+
+            completeExercise() {
+                triggerHapticFeedback('medium');
+                const exercise = this.currentWorkout.exercises[this.currentExercise];
+                
+                if (exercise.rest > 0 && this.currentExercise < this.currentWorkout.exercises.length - 1) {
+                    this.isResting = true;
+                    this.restTimer = exercise.rest;
+                    this.isTimerRunning = false;
+                } else if (this.currentExercise < this.currentWorkout.exercises.length - 1) {
+                    this.currentExercise++;
+                } else {
+                    this.completeWorkout();
+                    return;
+                }
+                
+                if (!this.isResting && this.currentExercise < this.currentWorkout.exercises.length - 1) {
+                    this.currentExercise++;
+                }
+                
+                this.render();
+            }
+
+            nextExercise() {
+                triggerHapticFeedback('light');
+                if (this.currentExercise < this.currentWorkout.exercises.length - 1) {
+                    this.currentExercise++;
+                    this.isResting = false;
+                    this.restTimer = 0;
+                    this.isTimerRunning = true;
+                    this.render();
+                }
+            }
+
+            completeWorkout() {
+                triggerHapticFeedback('heavy');
+                const completedWorkout = {
+                    ...this.currentWorkout,
+                    completedAt: new Date(),
+                    totalTime: this.timer,
+                    id: Date.now()
+                };
+                
+                this.workoutHistory.unshift(completedWorkout);
+                this.userStats.totalWorkouts++;
+                this.userStats.totalTime += this.timer;
+                
+                this.saveData();
+                this.resetWorkout();
+                this.activeTab = 'profile';
+                this.render();
+            }
+
+            resetWorkout() {
+                this.currentWorkout = null;
+                this.workoutInProgress = false;
+                this.currentExercise = 0;
+                this.timer = 0;
+                this.isTimerRunning = false;
+                this.isResting = false;
+                this.restTimer = 0;
+            }
+
+            filterWorkouts(workoutList) {
+                return workoutList.filter(workout => {
+                    if (this.filters.type !== 'all' && workout.type !== this.filters.type) return false;
+                    if (this.filters.equipment !== 'all' && workout.equipment !== this.filters.equipment) return false;
+                    if (this.filters.difficulty !== 'all' && workout.difficulty !== this.filters.difficulty) return false;
+                    if (this.filters.duration !== 'all') {
+                        const duration = workout.duration;
+                        switch(this.filters.duration) {
+                            case 'short': return duration <= 20;
+                            case 'medium': return duration > 20 && duration <= 40;
+                            case 'long': return duration > 40;
+                            default: return true;
+                        }
+                    }
+                    return true;
+                });
+            }
+
+            createCustomWorkout(workoutData) {
+                const newWorkout = {
+                    ...workoutData,
+                    id: Date.now(),
+                    custom: true,
+                    exercises: [{ name: workoutData.name + ' Exercise', duration: 60, rest: 30, reps: '10', sets: 1 }]
+                };
+                this.customWorkouts.unshift(newWorkout);
+                this.showCreateWorkout = false;
+                this.saveData();
+                triggerHapticFeedback('light');
+                this.render();
+            }
+
+            deleteCustomWorkout(id) {
+                this.customWorkouts = this.customWorkouts.filter(workout => workout.id !== id);
+                this.saveData();
+                triggerHapticFeedback('light');
+                this.render();
+            }
+
+            setActiveTab(tab) {
+                triggerHapticFeedback('light');
+                this.activeTab = tab;
+                this.render();
+            }
+
+            toggleTimer() {
+                triggerHapticFeedback('light');
+                this.isTimerRunning = !this.isTimerRunning;
+                this.render();
+            }
+
+            setFilter(filterType, value) {
+                this.filters[filterType] = value;
+                this.render();
+            }
+
+            showWorkoutDetail(workout) {
+                this.showWorkoutDetails = workout;
+                this.render();
+            }
+
+            hideWorkoutDetail() {
+                this.showWorkoutDetails = null;
+                this.render();
+            }
+
+            showCreateForm() {
+                this.showCreateWorkout = true;
+                this.render();
+            }
+
+            hideCreateForm() {
+                this.showCreateWorkout = false;
+                this.editingWorkout = null;
+                this.render();
+            }
+
+            resetProgress() {
+                this.userStats = {
+                    totalWorkouts: 0,
+                    totalTime: 0,
+                    streak: 0,
+                    favoriteType: 'Strength'
+                };
+                this.workoutHistory = [];
+                this.saveData();
+                this.render();
+            }
+
+            render() {
+                const root = document.getElementById('root');
+                root.innerHTML = this.renderApp();
+                this.attachEventListeners();
+            }
+
+            renderApp() {
+                return `
+                    <div id="app-container" class="container bg-gray-50 relative">
+                        ${this.renderHeader()}
+                        <div class="flex-1 overflow-hidden">
+                            ${this.renderContent()}
+                        </div>
+                        ${this.renderBottomNav()}
+                        ${this.renderModals()}
+                    </div>
+                `;
+            }
+
+            renderHeader() {
+                return `
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg sticky top-0 z-20 header-with-notch">
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    ${Icon('dumbbell', 32, 'mr-2')}
+                                    <h1 class="text-xl font-bold">FitFlow</h1>
+                                </div>
+                                ${this.workoutInProgress ? `
+                                    <div class="bg-white bg-opacity-20 px-3 py-2 rounded-full pulse-animation">
+                                        <span class="text-sm font-semibold timer-display">${this.formatTime(this.timer)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderContent() {
+                switch(this.activeTab) {
+                    case 'home':
+                        return this.renderHomeTab();
+                    case 'workout':
+                        return this.renderWorkoutTab();
+                    case 'profile':
+                        return this.renderProfileTab();
+                    default:
+                        return '';
+                }
+            }
+
+            renderHomeTab() {
+                const filteredWorkouts = this.filterWorkouts([...this.workouts, ...this.customWorkouts]);
+                
+                return `
+                    <div class="scrollable-content">
+                        <div class="p-4 pb-32">
+                            <div class="mb-6">
+                                <h1 class="text-2xl font-bold text-gray-800 mb-2">Welcome to FitFlow</h1>
+                                <p class="text-gray-600">Your personalized workout companion</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl fade-in">
+                                    <div class="flex items-center mb-2">
+                                        ${Icon('trophy', 24, 'mr-2')}
+                                        <span class="text-sm opacity-90">Total Workouts</span>
+                                    </div>
+                                    <p class="text-2xl font-bold">${this.userStats.totalWorkouts}</p>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-xl fade-in">
+                                    <div class="flex items-center mb-2">
+                                        ${Icon('clock', 24, 'mr-2')}
+                                        <span class="text-sm opacity-90">Total Time</span>
+                                    </div>
+                                    <p class="text-2xl font-bold">${Math.floor(this.userStats.totalTime / 60)}min</p>
+                                </div>
+                            </div>
+                            
+                            ${this.renderFilterBar()}
+                            
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-semibold text-gray-800">Available Workouts</h2>
+                                <button onclick="app.showCreateForm()" class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg transition-colors haptic-feedback">
+                                    ${Icon('plus', 20)}
+                                </button>
+                            </div>
+                            
+                            ${filteredWorkouts.length === 0 ? `
+                                <div class="text-center py-8">
+                                    <p class="text-gray-500">No workouts match your current filters.</p>
+                                </div>
+                            ` : filteredWorkouts.map(workout => this.renderWorkoutCard(workout)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderFilterBar() {
+                return `
+                    <div class="bg-white rounded-xl shadow-lg p-4 mb-4 fade-in">
+                        <div class="flex items-center mb-3">
+                            ${Icon('filter', 20, 'mr-2 text-blue-500')}
+                            <h3 class="font-semibold text-gray-800">Filter Workouts</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <select onchange="app.setFilter('type', this.value)" class="p-2 border rounded-lg text-sm">
+                                <option value="all" ${this.filters.type === 'all' ? 'selected' : ''}>All Types</option>
+                                <option value="HIIT" ${this.filters.type === 'HIIT' ? 'selected' : ''}>HIIT</option>
+                                <option value="Strength" ${this.filters.type === 'Strength' ? 'selected' : ''}>Strength</option>
+                                <option value="Cardio" ${this.filters.type === 'Cardio' ? 'selected' : ''}>Cardio</option>
+                                <option value="Yoga" ${this.filters.type === 'Yoga' ? 'selected' : ''}>Yoga</option>
+                                <option value="Core" ${this.filters.type === 'Core' ? 'selected' : ''}>Core</option>
+                                <option value="Full Body" ${this.filters.type === 'Full Body' ? 'selected' : ''}>Full Body</option>
+                            </select>
+                            
+                            <select onchange="app.setFilter('equipment', this.value)" class="p-2 border rounded-lg text-sm">
+                                <option value="all" ${this.filters.equipment === 'all' ? 'selected' : ''}>All Equipment</option>
+                                <option value="Bodyweight" ${this.filters.equipment === 'Bodyweight' ? 'selected' : ''}>Bodyweight</option>
+                                <option value="Dumbbells" ${this.filters.equipment === 'Dumbbells' ? 'selected' : ''}>Dumbbells</option>
+                                <option value="Resistance Bands" ${this.filters.equipment === 'Resistance Bands' ? 'selected' : ''}>Resistance Bands</option>
+                                <option value="Yoga Mat" ${this.filters.equipment === 'Yoga Mat' ? 'selected' : ''}>Yoga Mat</option>
+                            </select>
+                            
+                            <select onchange="app.setFilter('duration', this.value)" class="p-2 border rounded-lg text-sm">
+                                <option value="all" ${this.filters.duration === 'all' ? 'selected' : ''}>All Durations</option>
+                                <option value="short" ${this.filters.duration === 'short' ? 'selected' : ''}>Short (≤20min)</option>
+                                <option value="medium" ${this.filters.duration === 'medium' ? 'selected' : ''}>Medium (21-40min)</option>
+                                <option value="long" ${this.filters.duration === 'long' ? 'selected' : ''}>Long (40min+)</option>
+                            </select>
+                            
+                            <select onchange="app.setFilter('difficulty', this.value)" class="p-2 border rounded-lg text-sm">
+                                <option value="all" ${this.filters.difficulty === 'all' ? 'selected' : ''}>All Levels</option>
+                                <option value="Beginner" ${this.filters.difficulty === 'Beginner' ? 'selected' : ''}>Beginner</option>
+                                <option value="Intermediate" ${this.filters.difficulty === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+                                <option value="Advanced" ${this.filters.difficulty === 'Advanced' ? 'selected' : ''}>Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderWorkoutCard(workout) {
+                return `
+                    <div class="bg-white rounded-xl shadow-lg p-4 mb-4 border-l-4 border-blue-500 fade-in">
+                        <div class="flex justify-between items-start mb-3">
+                            <button onclick="app.showWorkoutDetail(${JSON.stringify(workout).replace(/"/g, '&quot;')})" class="text-left flex-1 haptic-feedback">
+                                <h3 class="font-bold text-lg text-gray-800 hover:text-blue-600 transition-colors">${workout.name}</h3>
+                            </button>
+                            ${workout.custom ? `
+                                <div class="flex gap-2 ml-2">
+                                    <button onclick="app.deleteCustomWorkout(${workout.id})" class="p-1 text-red-500 hover:bg-red-50 rounded haptic-feedback">
+                                        ${Icon('trash', 16)}
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-3 text-sm">
+                            <div class="flex items-center text-gray-600">
+                                ${Icon('target', 16, 'mr-1')}
+                                ${workout.type}
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                ${Icon('clock', 16, 'mr-1')}
+                                ${workout.duration}min
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                ${Icon('dumbbell', 16, 'mr-1')}
+                                ${workout.equipment}
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                ${Icon('fire', 16, 'mr-1')}
+                                ${workout.difficulty}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-orange-600 font-semibold">
+                                    ~${workout.calories} calories
+                                </span>
+                                <span class="text-xs text-gray-500">
+                                    ${workout.exercises.length} exercises
+                                </span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="app.showWorkoutDetail(${JSON.stringify(workout).replace(/"/g, '&quot;')})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg font-semibold transition-colors text-sm haptic-feedback">
+                                    View Details
+                                </button>
+                                <button onclick="app.startWorkout(${JSON.stringify(workout).replace(/"/g, '&quot;')})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors haptic-feedback">
+                                    Start
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderWorkoutTab() {
+                if (!this.workoutInProgress || !this.currentWorkout) {
+                    return `
+                        <div class="scrollable-content">
+                            <div class="flex items-center justify-center h-full p-8">
+                                <div class="text-center">
+                                    ${Icon('dumbbell', 48, 'mb-4 text-gray-400')}
+                                    <p class="text-gray-500 mb-4">No active workout</p>
+                                    <button onclick="app.setActiveTab('home')" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold haptic-feedback">
+                                        Browse Workouts
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                const exercise = this.currentWorkout.exercises[this.currentExercise];
+                
+                return `
+                    <div class="scrollable-content">
+                        <div class="p-4 pb-32">
+                            <div class="bg-white rounded-xl shadow-lg p-6 mb-4 fade-in">
+                                <div class="text-center mb-6">
+                                    <h2 class="text-2xl font-bold text-gray-800 mb-2">${this.currentWorkout.name}</h2>
+                                    <div class="flex justify-center items-center space-x-4 text-sm text-gray-600">
+                                        <span>Exercise ${this.currentExercise + 1} of ${this.currentWorkout.exercises.length}</span>
+                                        <span>•</span>
+                                        <span class="timer-display">${this.formatTime(this.timer)}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-100 rounded-full h-3 mb-6">
+                                    <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${((this.currentExercise + 1) / this.currentWorkout.exercises.length) * 100}%"></div>
+                                </div>
+                                
+                                ${this.isResting ? `
+                                    <div class="text-center">
+                                        <h3 class="text-xl font-semibold text-orange-600 mb-4">Rest Time</h3>
+                                        <div class="text-6xl font-bold text-orange-600 mb-4 pulse-animation rest-timer-display">
+                                            ${this.formatTime(this.restTimer)}
+                                        </div>
+                                        <p class="text-gray-600 mb-4">Get ready for: ${this.currentWorkout.exercises[this.currentExercise + 1]?.name || 'Workout Complete!'}</p>
+                                        <button onclick="app.nextExercise()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold haptic-feedback">
+                                            Skip Rest
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <div class="text-center">
+                                        <h3 class="text-3xl font-bold text-gray-800 mb-4">${exercise.name}</h3>
+                                        
+                                        <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+                                            ${exercise.duration ? `
+                                                <div class="bg-blue-50 p-4 rounded-lg">
+                                                    <div class="flex items-center justify-center">
+                                                        ${Icon('clock', 16, 'mr-1 text-blue-600')}
+                                                        <span class="text-blue-600 font-semibold">${exercise.duration}s</span>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            ${exercise.reps ? `
+                                                <div class="bg-green-50 p-4 rounded-lg">
+                                                    <div class="flex items-center justify-center">
+                                                        ${Icon('target', 16, 'mr-1 text-green-600')}
+                                                        <span class="text-green-600 font-semibold">${exercise.reps}</span>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            ${exercise.sets && exercise.sets > 1 ? `
+                                                <div class="bg-purple-50 p-4 rounded-lg">
+                                                    <div class="flex items-center justify-center">
+                                                        ${Icon('dumbbell', 16, 'mr-1 text-purple-600')}
+                                                        <span class="text-purple-600 font-semibold">${exercise.sets} sets</span>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            ${exercise.rest && exercise.rest > 0 ? `
+                                                <div class="bg-orange-50 p-4 rounded-lg">
+                                                    <div class="flex items-center justify-center">
+                                                        ${Icon('clock', 16, 'mr-1 text-orange-600')}
+                                                        <span class="text-orange-600 font-semibold">${exercise.rest}s rest</span>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                        
+                                        <div class="flex justify-center space-x-4">
+                                            <button onclick="app.toggleTimer()" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full transition-colors haptic-feedback">
+                                                ${Icon(this.isTimerRunning ? 'pause' : 'play', 24)}
+                                            </button>
+                                            
+                                            <button onclick="app.completeExercise()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors haptic-feedback">
+                                                ${Icon('check', 20, 'mr-2')}
+                                                ${this.currentExercise === this.currentWorkout.exercises.length - 1 ? 'Finish Workout' : 'Next Exercise'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                `}
+                                
+                                <div class="flex justify-center mt-6">
+                                    <button onclick="app.resetWorkout(); app.render();" class="text-red-500 hover:text-red-600 px-4 py-2 rounded-lg transition-colors haptic-feedback">
+                                        ${Icon('x', 16, 'mr-2')}
+                                        End Workout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderProfileTab() {
+                return `
+                    <div class="scrollable-content">
+                        <div class="p-4 pb-32">
+                            <div class="mb-6">
+                                <h1 class="text-2xl font-bold text-gray-800 mb-2">Your Profile</h1>
+                                <p class="text-gray-600">Track your fitness journey</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 gap-4 mb-6">
+                                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl fade-in">
+                                    <div class="flex items-center mb-4">
+                                        ${Icon('stats', 32, 'mr-3')}
+                                        <div>
+                                            <h3 class="text-lg font-semibold">Fitness Stats</h3>
+                                            <p class="text-sm opacity-90">Your progress overview</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm opacity-90">Total Workouts</p>
+                                            <p class="text-2xl font-bold">${this.userStats.totalWorkouts}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm opacity-90">Total Time</p>
+                                            <p class="text-2xl font-bold">${Math.floor(this.userStats.totalTime / 60)}min</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white rounded-xl shadow-lg p-6 fade-in">
+                                    <div class="flex items-center mb-4">
+                                        ${Icon('heart', 24, 'mr-2 text-red-500')}
+                                        <h3 class="text-lg font-semibold text-gray-800">Health Metrics</h3>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4 text-center">
+                                        <div class="bg-red-50 p-4 rounded-lg">
+                                            <p class="text-red-600 font-semibold text-lg">${this.userStats.totalWorkouts * 150}</p>
+                                            <p class="text-sm text-gray-600">Est. Calories Burned</p>
+                                        </div>
+                                        <div class="bg-blue-50 p-4 rounded-lg">
+                                            <p class="text-blue-600 font-semibold text-lg">${this.userStats.streak}</p>
+                                            <p class="text-sm text-gray-600">Day Streak</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Workouts</h2>
+                                ${this.workoutHistory.length === 0 ? `
+                                    <div class="text-center py-8">
+                                        ${Icon('dumbbell', 48, 'text-gray-400 mb-4')}
+                                        <p class="text-gray-500">No workouts completed yet. Start your first workout!</p>
+                                    </div>
+                                ` : this.workoutHistory.slice(0, 5).map(workout => `
+                                    <div class="bg-white rounded-xl shadow-lg p-4 mb-3 fade-in">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800">${workout.name}</h4>
+                                                <p class="text-sm text-gray-600">${workout.type} • ${workout.duration}min</p>
+                                                <p class="text-xs text-gray-500">
+                                                    ${new Date(workout.completedAt).toLocaleDateString()} at ${new Date(workout.completedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                </p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-sm font-semibold text-green-600">${this.formatTime(workout.totalTime)}</p>
+                                                <p class="text-xs text-gray-500">Duration</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="bg-white rounded-xl shadow-lg p-6 fade-in">
+                                <div class="flex items-center mb-4">
+                                    ${Icon('settings', 24, 'mr-2 text-gray-600')}
+                                    <h3 class="text-lg font-semibold text-gray-800">Quick Actions</h3>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <button onclick="app.showCreateForm()" class="w-full bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg font-semibold transition-colors text-left flex items-center haptic-feedback">
+                                        ${Icon('plus', 20, 'mr-3')}
+                                        Create Custom Workout
+                                    </button>
+                                    
+                                    <button onclick="app.resetProgress()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 p-4 rounded-lg font-semibold transition-colors text-left flex items-center haptic-feedback">
+                                        ${Icon('reset', 20, 'mr-3')}
+                                        Reset Progress
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderBottomNav() {
+                return `
+                    <div class="fixed bottom-0 left-1/2 transform w-full max-w-md bg-white border-t border-gray-200 shadow-lg z-20 bottom-nav-with-home-indicator">
+                        <div class="px-4 py-3">
+                            <div class="flex justify-around">
+                                <button onclick="app.setActiveTab('home')" class="flex flex-col items-center py-2 px-4 rounded-lg transition-colors haptic-feedback ${this.activeTab === 'home' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-gray-700'}">
+                                    ${Icon('home', 24)}
+                                    <span class="text-xs mt-1 font-medium">Home</span>
+                                </button>
+                                
+                                <button onclick="app.setActiveTab('workout')" class="flex flex-col items-center py-2 px-4 rounded-lg transition-colors haptic-feedback ${this.activeTab === 'workout' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-gray-700'}">
+                                    ${Icon('play', 24)}
+                                    <span class="text-xs mt-1 font-medium">Workout</span>
+                                </button>
+                                
+                                <button onclick="app.setActiveTab('profile')" class="flex flex-col items-center py-2 px-4 rounded-lg transition-colors haptic-feedback ${this.activeTab === 'profile' ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:text-gray-700'}">
+                                    ${Icon('user', 24)}
+                                    <span class="text-xs mt-1 font-medium">Profile</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderModals() {
+                let modals = '';
+                
+                if (this.showCreateWorkout) {
+                    modals += this.renderCreateWorkoutModal();
+                }
+                
+                if (this.showWorkoutDetails) {
+                    modals += this.renderWorkoutDetailsModal();
+                }
+                
+                return modals;
+            }
+
+            renderCreateWorkoutModal() {
+                return `
+                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div class="bg-white rounded-xl w-full max-w-md max-h-80vh overflow-y-auto fade-in">
+                            <div class="p-4 border-b flex justify-between items-center">
+                                <h2 class="text-xl font-bold">Create Custom Workout</h2>
+                                <button onclick="app.hideCreateForm()" class="p-2 hover:bg-gray-100 rounded haptic-feedback">
+                                    ${Icon('x', 20)}
+                                </button>
+                            </div>
+                            
+                            <form onsubmit="app.handleCreateWorkout(event)" class="p-4 space-y-4">
+                                <input type="text" id="workout-name" placeholder="Workout Name" class="w-full p-3 border rounded-lg" required>
+                                
+                                <div class="grid grid-cols-2 gap-2">
+                                    <select id="workout-type" class="p-3 border rounded-lg">
+                                        <option value="HIIT">HIIT</option>
+                                        <option value="Strength">Strength</option>
+                                        <option value="Cardio">Cardio</option>
+                                        <option value="Yoga">Yoga</option>
+                                        <option value="Core">Core</option>
+                                        <option value="Full Body">Full Body</option>
+                                    </select>
+                                    
+                                    <select id="workout-difficulty" class="p-3 border rounded-lg">
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advanced">Advanced</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" id="workout-duration" placeholder="Duration (min)" class="p-3 border rounded-lg" min="1" value="30" required>
+                                    <input type="number" id="workout-calories" placeholder="Calories" class="p-3 border rounded-lg" min="1" value="200" required>
+                                </div>
+                                
+                                <select id="workout-equipment" class="w-full p-3 border rounded-lg">
+                                    <option value="Bodyweight">Bodyweight</option>
+                                    <option value="Dumbbells">Dumbbells</option>
+                                    <option value="Resistance Bands">Resistance Bands</option>
+                                    <option value="Yoga Mat">Yoga Mat</option>
+                                    <option value="Kettlebell">Kettlebell</option>
+                                    <option value="Barbell">Barbell</option>
+                                </select>
+                                
+                                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition-colors haptic-feedback">
+                                    ${Icon('save', 16, 'mr-2')}
+                                    Create Workout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderWorkoutDetailsModal() {
+                const workout = this.showWorkoutDetails;
+                return `
+                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div class="bg-white rounded-xl w-full max-w-md max-h-80vh overflow-y-auto fade-in">
+                            <div class="p-4 border-b flex justify-between items-center">
+                                <h2 class="text-xl font-bold text-gray-800">${workout.name}</h2>
+                                <button onclick="app.hideWorkoutDetail()" class="p-2 hover:bg-gray-100 rounded haptic-feedback">
+                                    ${Icon('x', 20)}
+                                </button>
+                            </div>
+                            
+                            <div class="p-4">
+                                <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                                    <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                        ${Icon('target', 20, 'text-blue-600 mb-1')}
+                                        <p class="font-semibold text-blue-600">${workout.type}</p>
+                                        <p class="text-gray-600 text-xs">Type</p>
+                                    </div>
+                                    <div class="bg-green-50 p-3 rounded-lg text-center">
+                                        ${Icon('clock', 20, 'text-green-600 mb-1')}
+                                        <p class="font-semibold text-green-600">${workout.duration}min</p>
+                                        <p class="text-gray-600 text-xs">Duration</p>
+                                    </div>
+                                    <div class="bg-purple-50 p-3 rounded-lg text-center">
+                                        ${Icon('dumbbell', 20, 'text-purple-600 mb-1')}
+                                        <p class="font-semibold text-purple-600 text-xs">${workout.equipment}</p>
+                                        <p class="text-gray-600 text-xs">Equipment</p>
+                                    </div>
+                                    <div class="bg-orange-50 p-3 rounded-lg text-center">
+                                        ${Icon('fire', 20, 'text-orange-600 mb-1')}
+                                        <p class="font-semibold text-orange-600">${workout.difficulty}</p>
+                                        <p class="text-gray-600 text-xs">Level</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 text-center">
+                                    <p class="text-orange-600 font-semibold">~${workout.calories} calories burned</p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Exercises (${workout.exercises.length})</h3>
+                                    <div class="space-y-3 max-h-60 overflow-y-auto">
+                                        ${workout.exercises.map((exercise, index) => `
+                                            <div class="bg-gray-50 rounded-lg p-3">
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <h4 class="font-semibold text-gray-800 text-sm">${exercise.name}</h4>
+                                                    <span class="text-xs text-gray-500">#${index + 1}</span>
+                                                </div>
+                                                
+                                                <div class="flex flex-wrap gap-1 text-xs">
+                                                    ${exercise.duration ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded">${exercise.duration}s</span>` : ''}
+                                                    ${exercise.reps ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded">${exercise.reps}</span>` : ''}
+                                                    ${exercise.sets && exercise.sets > 1 ? `<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded">${exercise.sets} sets</span>` : ''}
+                                                    ${exercise.rest > 0 ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded">${exercise.rest}s rest</span>` : ''}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <button onclick="app.hideWorkoutDetail()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold transition-colors haptic-feedback">
+                                        Close
+                                    </button>
+                                    <button onclick="app.startWorkout(${JSON.stringify(workout).replace(/"/g, '&quot;')}); app.hideWorkoutDetail();" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition-colors haptic-feedback">
+                                        Start Workout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            attachEventListeners() {
+                // Event listeners are handled via onclick attributes in the HTML
+                // This method can be used for any additional event binding if needed
+            }
+
+            handleCreateWorkout(event) {
+                event.preventDefault();
+                const formData = {
+                    name: document.getElementById('workout-name').value,
+                    type: document.getElementById('workout-type').value,
+                    difficulty: document.getElementById('workout-difficulty').value,
+                    duration: parseInt(document.getElementById('workout-duration').value),
+                    calories: parseInt(document.getElementById('workout-calories').value),
+                    equipment: document.getElementById('workout-equipment').value
+                };
+                this.createCustomWorkout(formData);
+            }
+        }
+
+        // Initialize the app when the page loads
+        let app;
+        window.addEventListener('load', () => {
+            app = new WorkoutApp();
+        });
+
+        // Global method for form submission
+        window.handleCreateWorkout = function(event) {
+            if (app) {
+                app.handleCreateWorkout(event);
+            }
+        };
+    </script>
+</body>
+</html>
