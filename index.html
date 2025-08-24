@@ -1252,7 +1252,16 @@
                         isResting = false;
                         isTimerRunning = true;
                         
-                        if (currentTab === 'workout') showWorkoutTab();
+                        if (currentTab === 'workout') {
+                            showWorkoutTab();
+                            // Scroll to top when rest timer completes
+                            setTimeout(() => {
+                                const content = document.getElementById('content');
+                                if (content) {
+                                    content.scrollTo({ top: 0, behavior: 'smooth' });
+                                }
+                            }, 100);
+                        }
                     }
                     updateRestTimerDisplay();
                 }
@@ -1294,6 +1303,14 @@
                 case 'workout': showWorkoutTab(); break;
                 case 'profile': showProfileTab(); break;
             }
+            
+            // Scroll to top when switching tabs
+            setTimeout(() => {
+                const content = document.getElementById('content');
+                if (content) {
+                    content.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 50);
         }
 
         // Home tab
@@ -1770,6 +1787,14 @@
             isResting = false;
             restTimer = 0;
             showTab('workout');
+            
+            // Scroll to top of the workout content
+            setTimeout(() => {
+                const content = document.getElementById('content');
+                if (content) {
+                    content.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 100);
         }
 
         function toggleTimer() {
@@ -1814,6 +1839,14 @@
             }
             
             showWorkoutTab();
+            
+            // Scroll to top after exercise completion
+            setTimeout(() => {
+                const content = document.getElementById('content');
+                if (content) {
+                    content.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 100);
         }
 
         function skipRest() {
@@ -1821,6 +1854,14 @@
             restTimer = 0;
             isTimerRunning = true;
             showWorkoutTab();
+            
+            // Scroll to top after skipping rest
+            setTimeout(() => {
+                const content = document.getElementById('content');
+                if (content) {
+                    content.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 100);
         }
 
         // Complete workout with streak tracking
@@ -2679,4 +2720,3 @@
     </script>
 </body>
 </html>
-                
