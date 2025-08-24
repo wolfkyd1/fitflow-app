@@ -366,8 +366,9 @@
             margin-bottom: 20px;
             text-align: left;
             font-size: 14px;
-            color: #4b5563;
+            color: #1f2937;
             line-height: 1.6;
+            border: 2px solid #e5e7eb;
         }
         
         .exercise-details {
@@ -624,6 +625,39 @@
             margin-bottom: 12px;
             border-radius: 12px;
             position: relative;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+        
+        .exercise-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            z-index: 1000;
+        }
+        
+        .exercise-item.drag-over {
+            border-color: #667eea;
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+        
+        .drag-handle {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: grab;
+            font-size: 18px;
+            padding: 4px;
+        }
+        
+        .drag-handle:hover {
+            color: #667eea;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
         }
         
         .exercise-controls {
@@ -817,15 +851,17 @@
             .workout-title { color: #f3f4f6; }
             .nav { background: #374151; border-top-color: #4b5563; }
             .nav-item { color: #9ca3af; }
-            .detail-card { background: linear-gradient(135deg, #4b5563, #374151); }
+            .detail-card { background: linear-gradient(135deg, #4b5563, #374151); color: #f3f4f6; }
             .detail-card strong { color: #f3f4f6; }
-            .exercise-description { background: #374151; color: #d1d5db; }
+            .exercise-description { background: #374151; color: #e5e7eb; border-color: #4b5563; }
             .modal-content { background: #374151; color: #f3f4f6; }
             .modal-header h3 { color: #f3f4f6; }
-            .form-label { color: #d1d5db; }
+            .form-label { color: #e5e7eb; }
             .form-input, .form-select { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
             .equipment-list { background: #1f2937; border-color: #4b5563; }
-            .exercise-item { background: #1f2937; border-color: #4b5563; }
+            .exercise-item { background: #1f2937; border-color: #4b5563; color: #f3f4f6; }
+            .exercise-item.dragging { background: #4b5563; }
+            .exercise-item.drag-over { border-color: #667eea; background: #374151; }
         }
     </style>
 </head>
@@ -1078,6 +1114,112 @@
             startTimerLoop();
         }
 
+        // Quick Start rotation functions
+        function getQuickStartWorkout(allWorkouts) {
+            if (allWorkouts.length === 0) return null;
+            
+            // Get the current rotation index from localStorage
+            let rotationIndex = parseInt(localStorage.getItem('fitflow-quick-start-index') || '0');
+            
+            // Ensure the index is valid
+            if (rotationIndex >= allWorkouts.length) {
+                rotationIndex = 0;
+            }
+            
+            return allWorkouts[rotationIndex];
+        }
+
+        function rotateQuickStart() {
+            const allWorkouts = [...workouts, ...customWorkouts];
+            if (allWorkouts.length === 0) return;
+            
+            let rotationIndex = parseInt(localStorage.getItem('fitflow-quick-start-index') || '0');
+            rotationIndex = (rotationIndex + 1) % allWorkouts.length;
+            localStorage.setItem('fitflow-quick-start-index', rotationIndex.toString());
+            
+            showHomeTab(); // Refresh the home tab to show the new workout
+        }
+
+        // Drag and drop functions
+        function setupDragAndDrop(container) {
+            const exercises = container.querySelectorAll('.exercise-item');
+            
+            exercises.forEach((exercise, index) => {
+                exercise.draggable = true;
+                exercise.dataset.index = index;
+                
+                exercise.addEventListener('dragstart', handleDragStart);
+                exercise.addEventListener('dragover', handleDragOver);
+                exercise.addEventListener('drop', handleDrop);
+                exercise.addEventListener('dragend', handleDragEnd);
+                exercise.addEventListener('dragenter', handleDragEnter);
+                exercise.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.index);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (!e.target.classList.contains('dragging')) {
+                e.target.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+            const targetIndex = parseInt(e.target.closest('.exercise-item').dataset.index);
+            
+            if (draggedIndex !== targetIndex) {
+                reorderExercises(draggedIndex, targetIndex);
+            }
+            
+            // Clean up classes
+            document.querySelectorAll('.exercise-item').forEach(item => {
+                item.classList.remove('drag-over', 'dragging');
+            });
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.exercise-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+        }
+
+        function reorderExercises(fromIndex, toIndex) {
+            const container = document.getElementById('editExerciseList');
+            const items = Array.from(container.children);
+            
+            // Move the DOM element
+            const draggedItem = items[fromIndex];
+            const targetItem = items[toIndex];
+            
+            if (fromIndex < toIndex) {
+                container.insertBefore(draggedItem, targetItem.nextSibling);
+            } else {
+                container.insertBefore(draggedItem, targetItem);
+            }
+            
+            // Update dataset indices
+            Array.from(container.children).forEach((item, index) => {
+                item.dataset.index = index;
+            });
+        }
+
         // Load/save data
         function loadData() {
             try {
@@ -1181,9 +1323,8 @@
             const allWorkouts = [...workouts, ...customWorkouts];
             const content = document.getElementById('content');
             
-            // Get last workout for quick start
-            const lastWorkoutId = localStorage.getItem('fitflow-last-workout-id');
-            const lastWorkout = lastWorkoutId ? allWorkouts.find(w => w.id == lastWorkoutId) : null;
+            // Get rotating quick start workout instead of just last workout
+            const quickStartWorkout = getQuickStartWorkout(allWorkouts);
             
             content.innerHTML = `
                 <div class="stats-grid">
@@ -1211,7 +1352,7 @@
                     </div>
                 ` : ''}
 
-                ${lastWorkout ? `
+                ${quickStartWorkout ? `
                     <div style="background: linear-gradient(135deg, #10b981, #059669); 
                                 color: white; 
                                 padding: 16px; 
@@ -1219,20 +1360,33 @@
                                 margin-bottom: 20px;
                                 box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
+                            <div style="flex: 1;">
                                 <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">⚡ Quick Start</div>
-                                <div style="font-weight: bold; font-size: 16px;">${lastWorkout.name}</div>
+                                <div style="font-weight: bold; font-size: 16px;">${quickStartWorkout.name}</div>
+                                <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${quickStartWorkout.type} • ${quickStartWorkout.duration}min</div>
                             </div>
-                            <button onclick="startWorkout(${lastWorkout.id})" 
-                                    style="background: white; 
-                                           color: #10b981; 
-                                           border: none; 
-                                           padding: 10px 20px; 
-                                           border-radius: 8px; 
-                                           font-weight: bold; 
-                                           cursor: pointer;">
-                                Start →
-                            </button>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button onclick="rotateQuickStart()" 
+                                        style="background: rgba(255,255,255,0.2); 
+                                               color: white; 
+                                               border: none; 
+                                               padding: 8px; 
+                                               border-radius: 6px; 
+                                               cursor: pointer;
+                                               font-size: 16px;">
+                                    🔄
+                                </button>
+                                <button onclick="startWorkout(${quickStartWorkout.id})" 
+                                        style="background: white; 
+                                               color: #10b981; 
+                                               border: none; 
+                                               padding: 10px 20px; 
+                                               border-radius: 8px; 
+                                               font-weight: bold; 
+                                               cursor: pointer;">
+                                    Start →
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ` : ''}
@@ -1257,7 +1411,7 @@
                         </div>
                         <div class="workout-info">
                             <div>🎯 ${workout.type}</div>
-                            <div>🕒 ${workout.duration}min</div>
+                            <div>🕐 ${workout.duration}min</div>
                             <div>💪 ${workout.muscleGroups ? workout.muscleGroups[0] : 'Full Body'}</div>
                             <div>🔥 ${workout.difficulty}</div>
                         </div>
@@ -1342,7 +1496,7 @@
                             </div>
                             
                             <button class="btn" style="background: white; color: #f59e0b; margin-top: 24px; font-size: 16px; padding: 16px;" onclick="skipRest()">
-                                Skip Rest ⏭️
+                                Skip Rest ⭐
                             </button>
                         </div>
                         
@@ -2232,18 +2386,19 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Exercises</label>
+                            <label class="form-label">Exercises <small style="color: #6b7280;">(Drag to reorder)</small></label>
                             <div id="editExerciseList">
                                 ${workout.exercises.map((exercise, index) => `
-                                    <div class="exercise-item" data-index="${index}">
-                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                    <div class="exercise-item" data-index="${index}" draggable="true">
+                                        <div class="drag-handle">⋮⋮</div>
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px; margin-left: 24px;">
                                             <input type="text" value="${exercise.name}" placeholder="Exercise name" class="form-input" style="flex: 1;">
-                                            <button type="button" onclick="this.parentElement.parentElement.remove()" 
+                                            <button type="button" onclick="this.parentElement.parentElement.remove(); updateExerciseIndices()" 
                                                     class="btn btn-danger" style="width: auto; padding: 8px 12px;">
                                                 Remove
                                             </button>
                                         </div>
-                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px;">
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px; margin-left: 24px;">
                                             <div>
                                                 <div class="exercise-control-label">Duration(s)</div>
                                                 <input type="number" value="${exercise.duration || ''}" class="form-input" style="padding: 6px; font-size: 14px;">
@@ -2280,6 +2435,11 @@
             
             document.body.appendChild(modal);
             
+            // Set up drag and drop functionality
+            setTimeout(() => {
+                setupDragAndDrop(document.getElementById('editExerciseList'));
+            }, 100);
+            
             document.getElementById('editWorkoutForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleEditWorkout();
@@ -2288,17 +2448,21 @@
 
         function addEditExercise() {
             const exerciseList = document.getElementById('editExerciseList');
+            const newIndex = exerciseList.children.length;
             const newExercise = document.createElement('div');
             newExercise.className = 'exercise-item';
+            newExercise.dataset.index = newIndex;
+            newExercise.draggable = true;
             newExercise.innerHTML = `
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <div class="drag-handle">⋮⋮</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px; margin-left: 24px;">
                     <input type="text" placeholder="Exercise name" class="form-input" style="flex: 1;" value="New Exercise">
-                    <button type="button" onclick="this.parentElement.parentElement.remove()" 
+                    <button type="button" onclick="this.parentElement.parentElement.remove(); updateExerciseIndices()" 
                             class="btn btn-danger" style="width: auto; padding: 8px 12px;">
                         Remove
                     </button>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(65px, 1fr)); gap: 4px; margin-left: 24px;">
                     <div>
                         <div class="exercise-control-label">Duration(s)</div>
                         <input type="number" class="form-input" value="45" style="padding: 6px; font-size: 14px;">
@@ -2322,6 +2486,21 @@
                 </div>
             `;
             exerciseList.appendChild(newExercise);
+            
+            // Set up drag and drop for the new exercise
+            newExercise.addEventListener('dragstart', handleDragStart);
+            newExercise.addEventListener('dragover', handleDragOver);
+            newExercise.addEventListener('drop', handleDrop);
+            newExercise.addEventListener('dragend', handleDragEnd);
+            newExercise.addEventListener('dragenter', handleDragEnter);
+            newExercise.addEventListener('dragleave', handleDragLeave);
+        }
+
+        function updateExerciseIndices() {
+            const exercises = document.querySelectorAll('#editExerciseList .exercise-item');
+            exercises.forEach((exercise, index) => {
+                exercise.dataset.index = index;
+            });
         }
 
         function showWorkoutDetails(id) {
