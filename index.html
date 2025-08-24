@@ -109,22 +109,6 @@
             }
         }
         
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: shimmer 3s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         .header h1 {
             font-size: 28px;
             font-weight: 700;
@@ -1508,9 +1492,11 @@
                             </button>
                         </div>
                         
-                        <button onclick="endWorkout()" style="background: none; border: none; color: #ef4444; cursor: pointer; margin-top: 16px; font-size: 14px;">
-                            ❌ End Workout
-                        </button>
+                        <div style="display: flex; justify-content: center; margin-top: 20px;">
+                            <button onclick="endWorkout()" class="btn btn-danger" style="width: auto; padding: 12px 24px; font-size: 14px;">
+                                ❌ End Workout
+                            </button>
+                        </div>
                     </div>
                 `;
             } else {
@@ -1901,7 +1887,7 @@
         }
 
         function endWorkout() {
-            if (confirm('Are you sure you want to end this workout?')) {
+            if (confirm('Are you sure you want to end this workout? Your progress will not be saved.')) {
                 resetWorkout();
                 showTab('home');
             }
@@ -2693,3 +2679,4 @@
     </script>
 </body>
 </html>
+                
