@@ -90,20 +90,16 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 16px 20px;
+            padding: 0 20px 16px 20px;
             padding-top: calc(44px + env(safe-area-inset-top, 0px));
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
-            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-            border-radius: 0 0 20px 20px;
+            min-height: fit-content;
         }
         
         /* Fallback for older browsers */
@@ -153,8 +149,6 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            padding: 20px;
-            padding-bottom: 20px;
             scroll-behavior: smooth;
             position: relative;
             min-height: 0;
@@ -814,7 +808,6 @@
             .nav-item .icon { font-size: 18px; }
             .exercise-controls { grid-template-columns: 1fr 1fr; }
             .card { padding: 16px; margin-bottom: 12px; }
-            .content { padding: 16px; }
             .workout-info { font-size: 12px; }
             .modal-content { padding: 16px; }
             .form-input, .form-select { font-size: 16px !important; }
@@ -869,13 +862,12 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="header">
-            <h1>💪 FitFlow</h1>
-            <p>Your Personal Workout Companion</p>
-        </div>
-        
         <div class="content" id="content">
-            <!-- Content will be dynamically loaded here -->
+            <div class="header">
+                <h1>💪 FitFlow</h1>
+                <p>Your Personal Workout Companion</p>
+            </div>
+            <!-- Dynamic content will be loaded here -->
         </div>
         
         <div class="nav">
@@ -1329,104 +1321,110 @@
             const quickStartWorkout = getQuickStartWorkout(allWorkouts);
             
             content.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">${userStats.totalWorkouts}</div>
-                        <div class="stat-label">Total Workouts</div>
-                    </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
-                        <div class="stat-number">${Math.floor(userStats.totalTime / 60)}min</div>
-                        <div class="stat-label">Total Time</div>
-                    </div>
+                <div class="header">
+                    <h1>💪 FitFlow</h1>
+                    <p>Your Personal Workout Companion</p>
                 </div>
-
-                ${userStats.streak > 0 ? `
-                    <div style="background: linear-gradient(135deg, #f59e0b, #dc2626); 
-                                color: white; 
-                                padding: 12px; 
-                                border-radius: 12px; 
-                                margin-bottom: 16px;
-                                text-align: center;
-                                box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
-                        <span style="font-size: 20px;">🔥</span>
-                        <span style="font-weight: bold; font-size: 16px;">${userStats.streak} Day Streak!</span>
-                        <span style="opacity: 0.9; font-size: 14px;">Keep it going!</span>
-                    </div>
-                ` : ''}
-
-                ${quickStartWorkout ? `
-                    <div style="background: linear-gradient(135deg, #10b981, #059669); 
-                                color: white; 
-                                padding: 16px; 
-                                border-radius: 12px; 
-                                margin-bottom: 20px;
-                                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="flex: 1;">
-                                <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">⚡ Quick Start</div>
-                                <div style="font-weight: bold; font-size: 16px;">${quickStartWorkout.name}</div>
-                                <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${quickStartWorkout.type} • ${quickStartWorkout.duration}min</div>
-                            </div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <button onclick="rotateQuickStart()" 
-                                        style="background: rgba(255,255,255,0.2); 
-                                               color: white; 
-                                               border: none; 
-                                               padding: 8px; 
-                                               border-radius: 6px; 
-                                               cursor: pointer;
-                                               font-size: 16px;">
-                                    🔄
-                                </button>
-                                <button onclick="startWorkout(${quickStartWorkout.id})" 
-                                        style="background: white; 
-                                               color: #10b981; 
-                                               border: none; 
-                                               padding: 10px 20px; 
-                                               border-radius: 8px; 
-                                               font-weight: bold; 
-                                               cursor: pointer;">
-                                    Start →
-                                </button>
-                            </div>
+                <div style="padding: 20px;">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">${userStats.totalWorkouts}</div>
+                            <div class="stat-label">Total Workouts</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                            <div class="stat-number">${Math.floor(userStats.totalTime / 60)}min</div>
+                            <div class="stat-label">Total Time</div>
                         </div>
                     </div>
-                ` : ''}
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                    <button class="btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="showAIWorkoutModal()">
-                        🤖 AI Workout
-                    </button>
-                    <button class="btn" style="background: linear-gradient(135deg, #a855f7, #9333ea);" onclick="showCreateWorkoutModal()">
-                        📝 Custom
-                    </button>
+                    ${userStats.streak > 0 ? `
+                        <div style="background: linear-gradient(135deg, #f59e0b, #dc2626); 
+                                    color: white; 
+                                    padding: 12px; 
+                                    border-radius: 12px; 
+                                    margin-bottom: 16px;
+                                    text-align: center;
+                                    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                            <span style="font-size: 20px;">🔥</span>
+                            <span style="font-weight: bold; font-size: 16px;">${userStats.streak} Day Streak!</span>
+                            <span style="opacity: 0.9; font-size: 14px;">Keep it going!</span>
+                        </div>
+                    ` : ''}
+
+                    ${quickStartWorkout ? `
+                        <div style="background: linear-gradient(135deg, #10b981, #059669); 
+                                    color: white; 
+                                    padding: 16px; 
+                                    border-radius: 12px; 
+                                    margin-bottom: 20px;
+                                    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">⚡ Quick Start</div>
+                                    <div style="font-weight: bold; font-size: 16px;">${quickStartWorkout.name}</div>
+                                    <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${quickStartWorkout.type} • ${quickStartWorkout.duration}min</div>
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <button onclick="rotateQuickStart()" 
+                                            style="background: rgba(255,255,255,0.2); 
+                                                   color: white; 
+                                                   border: none; 
+                                                   padding: 8px; 
+                                                   border-radius: 6px; 
+                                                   cursor: pointer;
+                                                   font-size: 16px;">
+                                        🔄
+                                    </button>
+                                    <button onclick="startWorkout(${quickStartWorkout.id})" 
+                                            style="background: white; 
+                                                   color: #10b981; 
+                                                   border: none; 
+                                                   padding: 10px 20px; 
+                                                   border-radius: 8px; 
+                                                   font-weight: bold; 
+                                                   cursor: pointer;">
+                                        Start →
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                        <button class="btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="showAIWorkoutModal()">
+                            🤖 AI Workout
+                        </button>
+                        <button class="btn" style="background: linear-gradient(135deg, #a855f7, #9333ea);" onclick="showCreateWorkoutModal()">
+                            📝 Custom
+                        </button>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px; color: #1f2937;">Available Workouts</h3>
+                    
+                    ${allWorkouts.map(workout => `
+                        <div class="card">
+                            <div class="workout-title">
+                                ${workout.name}
+                                ${workout.aiGenerated ? ' 🤖' : ''}
+                                ${workout.custom ? ` <button onclick="deleteWorkout(${workout.id})" style="background: none; border: none; color: #ef4444; cursor: pointer; float: right;">🗑️</button>` : ''}
+                            </div>
+                            <div class="workout-info">
+                                <div>🎯 ${workout.type}</div>
+                                <div>🕐 ${workout.duration}min</div>
+                                <div>💪 ${workout.muscleGroups ? workout.muscleGroups[0] : 'Full Body'}</div>
+                                <div>🔥 ${workout.difficulty}</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">
+                                Equipment: ${Array.isArray(workout.equipment) ? workout.equipment[0] : workout.equipment} • ~${workout.calories} cal
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})">Details</button>
+                                ${workout.custom || workout.aiGenerated ? `<button class="btn btn-warning" onclick="editWorkout(${workout.id})">Edit</button>` : ''}
+                                <button class="btn btn-success" onclick="startWorkout(${workout.id})">Start</button>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-
-                <h3 style="margin-bottom: 16px; color: #1f2937;">Available Workouts</h3>
-                
-                ${allWorkouts.map(workout => `
-                    <div class="card">
-                        <div class="workout-title">
-                            ${workout.name}
-                            ${workout.aiGenerated ? ' 🤖' : ''}
-                            ${workout.custom ? ` <button onclick="deleteWorkout(${workout.id})" style="background: none; border: none; color: #ef4444; cursor: pointer; float: right;">🗑️</button>` : ''}
-                        </div>
-                        <div class="workout-info">
-                            <div>🎯 ${workout.type}</div>
-                            <div>🕐 ${workout.duration}min</div>
-                            <div>💪 ${workout.muscleGroups ? workout.muscleGroups[0] : 'Full Body'}</div>
-                            <div>🔥 ${workout.difficulty}</div>
-                        </div>
-                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">
-                            Equipment: ${Array.isArray(workout.equipment) ? workout.equipment[0] : workout.equipment} • ~${workout.calories} cal
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})">Details</button>
-                            ${workout.custom || workout.aiGenerated ? `<button class="btn btn-warning" onclick="editWorkout(${workout.id})">Edit</button>` : ''}
-                            <button class="btn btn-success" onclick="startWorkout(${workout.id})">Start</button>
-                        </div>
-                    </div>
-                `).join('')}
             `;
         }
 
@@ -1436,7 +1434,11 @@
             
             if (!workoutInProgress || !currentWorkout) {
                 content.innerHTML = `
-                    <div class="workout-active">
+                    <div class="header">
+                        <h1>💪 FitFlow</h1>
+                        <p>Your Personal Workout Companion</p>
+                    </div>
+                    <div class="workout-active" style="padding: 20px;">
                         <div style="font-size: 64px; margin-bottom: 20px;">💪</div>
                         <h2 style="color: #667eea; margin-bottom: 16px;">Ready to Workout?</h2>
                         <p style="color: #6b7280; margin-bottom: 24px;">Select a workout from the home screen to begin your fitness journey!</p>
@@ -1458,7 +1460,11 @@
                 const nextExercise = currentWorkout.exercises[currentExercise + 1];
                 
                 content.innerHTML = `
-                    <div class="workout-active">
+                    <div class="header">
+                        <h1>💪 FitFlow</h1>
+                        <p>Your Personal Workout Companion</p>
+                    </div>
+                    <div class="workout-active" style="padding: 20px;">
                         <h2 style="font-size: 24px; margin-bottom: 16px;">${currentWorkout.name}</h2>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${progress}%"></div>
@@ -1515,7 +1521,11 @@
                 const percentComplete = Math.round((exercisesCompleted / totalExercises) * 100);
                 
                 content.innerHTML = `
-                    <div class="workout-active">
+                    <div class="header">
+                        <h1>💪 FitFlow</h1>
+                        <p>Your Personal Workout Companion</p>
+                    </div>
+                    <div class="workout-active" style="padding: 20px;">
                         <h2 style="font-size: 24px; margin-bottom: 16px; color: #1f2937;">${currentWorkout.name}</h2>
                         
                         <div class="progress-bar" style="margin-bottom: 12px;">
@@ -1638,88 +1648,94 @@
             const content = document.getElementById('content');
             
             content.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">
-                        <div class="stat-number">${userStats.totalWorkouts}</div>
-                        <div class="stat-label">Total Workouts</div>
-                    </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
-                        <div class="stat-number">${Math.floor(userStats.totalTime / 60)}min</div>
-                        <div class="stat-label">Total Time</div>
-                    </div>
+                <div class="header">
+                    <h1>💪 FitFlow</h1>
+                    <p>Your Personal Workout Companion</p>
                 </div>
-
-                ${userStats.streak > 0 ? `
-                    <div style="background: linear-gradient(135deg, #f59e0b, #dc2626); 
-                                color: white; 
-                                padding: 20px; 
-                                border-radius: 16px; 
-                                margin-bottom: 20px;
-                                text-align: center;
-                                box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
-                        <div style="font-size: 48px; margin-bottom: 8px;">🔥</div>
-                        <div style="font-size: 32px; font-weight: bold;">${userStats.streak} Day${userStats.streak > 1 ? 's' : ''}</div>
-                        <div style="font-size: 14px; opacity: 0.9;">Current Streak</div>
+                <div style="padding: 20px;">
+                    <div class="stats-grid">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">
+                            <div class="stat-number">${userStats.totalWorkouts}</div>
+                            <div class="stat-label">Total Workouts</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                            <div class="stat-number">${Math.floor(userStats.totalTime / 60)}min</div>
+                            <div class="stat-label">Total Time</div>
+                        </div>
                     </div>
-                ` : ''}
 
-                <div class="weight-tracker">
-                    <h3 style="margin-bottom: 12px;">💪 Your Max Weights</h3>
-                    <p style="font-size: 14px; opacity: 0.9; margin-bottom: 16px;">Track your personal records for AI recommendations</p>
-                    <button class="btn" style="background: white; color: #f59e0b;" onclick="showWeightModal()">
-                        📊 Update Weights
-                    </button>
-                    ${Object.keys(userWeights).length > 0 ? `
-                        <div class="weight-grid">
-                            ${Object.entries(userWeights).slice(0, 4).map(([exercise, weight]) => `
-                                <div class="weight-item">
-                                    <div class="weight-label">${exercise}</div>
-                                    <div class="weight-value">${weight} lbs</div>
-                                </div>
-                            `).join('')}
+                    ${userStats.streak > 0 ? `
+                        <div style="background: linear-gradient(135deg, #f59e0b, #dc2626); 
+                                    color: white; 
+                                    padding: 20px; 
+                                    border-radius: 16px; 
+                                    margin-bottom: 20px;
+                                    text-align: center;
+                                    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                            <div style="font-size: 48px; margin-bottom: 8px;">🔥</div>
+                            <div style="font-size: 32px; font-weight: bold;">${userStats.streak} Day${userStats.streak > 1 ? 's' : ''}</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Current Streak</div>
                         </div>
                     ` : ''}
-                </div>
 
-                <div class="progressive-overload-box">
-                    <h4>📈 Progressive Overload</h4>
-                    <p style="font-size: 14px; opacity: 0.9; margin-bottom: 12px;">
-                        ${progressiveOverload.enabled ? `Active: +${progressiveOverload.percentage}% every ${progressiveOverload.weeks} weeks` : 'Disabled - Enable to auto-increase weights'}
-                    </p>
-                    <button class="btn" style="background: white; color: #10b981;" onclick="showProgressiveOverloadModal()">
-                        ⚙️ Configure
-                    </button>
-                </div>
-
-                <h3 style="margin-bottom: 16px; color: #1f2937;">Recent Workouts</h3>
-                
-                ${workoutHistory.length === 0 ? `
-                    <div style="text-align: center; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-                        <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
-                        <h3 style="color: #667eea; margin-bottom: 12px;">Ready to Start?</h3>
-                        <p style="color: #6b7280; margin-bottom: 20px;">Complete your first workout to begin tracking your fitness journey!</p>
-                        <button class="btn" onclick="showTab('home')">Start First Workout</button>
+                    <div class="weight-tracker">
+                        <h3 style="margin-bottom: 12px;">💪 Your Max Weights</h3>
+                        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 16px;">Track your personal records for AI recommendations</p>
+                        <button class="btn" style="background: white; color: #f59e0b;" onclick="showWeightModal()">
+                            📊 Update Weights
+                        </button>
+                        ${Object.keys(userWeights).length > 0 ? `
+                            <div class="weight-grid">
+                                ${Object.entries(userWeights).slice(0, 4).map(([exercise, weight]) => `
+                                    <div class="weight-item">
+                                        <div class="weight-label">${exercise}</div>
+                                        <div class="weight-value">${weight} lbs</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
                     </div>
-                ` : workoutHistory.slice(0, 5).map(workout => `
-                    <div class="card" style="border-left-color: #22c55e;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <div>
-                                <div class="workout-title">${workout.name}</div>
-                                <div style="color: #6b7280; font-size: 14px;">
-                                    ${workout.type} • ${new Date(workout.completedAt).toLocaleDateString()}
+
+                    <div class="progressive-overload-box">
+                        <h4>📈 Progressive Overload</h4>
+                        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 12px;">
+                            ${progressiveOverload.enabled ? `Active: +${progressiveOverload.percentage}% every ${progressiveOverload.weeks} weeks` : 'Disabled - Enable to auto-increase weights'}
+                        </p>
+                        <button class="btn" style="background: white; color: #10b981;" onclick="showProgressiveOverloadModal()">
+                            ⚙️ Configure
+                        </button>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px; color: #1f2937;">Recent Workouts</h3>
+                    
+                    ${workoutHistory.length === 0 ? `
+                        <div style="text-align: center; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+                            <h3 style="color: #667eea; margin-bottom: 12px;">Ready to Start?</h3>
+                            <p style="color: #6b7280; margin-bottom: 20px;">Complete your first workout to begin tracking your fitness journey!</p>
+                            <button class="btn" onclick="showTab('home')">Start First Workout</button>
+                        </div>
+                    ` : workoutHistory.slice(0, 5).map(workout => `
+                        <div class="card" style="border-left-color: #22c55e;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div>
+                                    <div class="workout-title">${workout.name}</div>
+                                    <div style="color: #6b7280; font-size: 14px;">
+                                        ${workout.type} • ${new Date(workout.completedAt).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: #22c55e; font-weight: bold;">${formatTime(workout.totalTime)}</div>
+                                    <div style="color: #9ca3af; font-size: 12px;">Duration</div>
                                 </div>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="color: #22c55e; font-weight: bold;">${formatTime(workout.totalTime)}</div>
-                                <div style="color: #9ca3af; font-size: 12px;">Duration</div>
-                            </div>
                         </div>
-                    </div>
-                `).join('')}
+                    `).join('')}
 
-                <button class="btn btn-danger" style="margin-top: 20px;" onclick="resetProgress()">
-                    🔄 Reset All Progress
-                </button>
+                    <button class="btn btn-danger" style="margin-top: 20px;" onclick="resetProgress()">
+                        🔄 Reset All Progress
+                    </button>
+                </div>
             `;
         }
 
