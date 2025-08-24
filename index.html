@@ -90,18 +90,20 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 0 20px 16px 20px;
+            padding: 16px 20px;
             padding-top: calc(44px + env(safe-area-inset-top, 0px));
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            position: relative;
             overflow: hidden;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: fit-content;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            border-radius: 0 0 20px 20px;
         }
         
         /* Fallback for older browsers */
@@ -853,7 +855,7 @@
             .nav-item { color: #9ca3af; }
             .detail-card { background: linear-gradient(135deg, #4b5563, #374151); color: #f3f4f6; }
             .detail-card strong { color: #f3f4f6; }
-            .exercise-description { background: #374151; color: #e5e7eb; border-color: #4b5563; }
+            .exercise-description { background: #374151; color: #000000; border-color: #4b5563; }
             .modal-content { background: #374151; color: #f3f4f6; }
             .modal-header h3 { color: #f3f4f6; }
             .form-label { color: #e5e7eb; }
