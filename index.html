@@ -982,7 +982,7 @@
         // Dumbbell exercises (per arm)
         const dumbbellExercises = [
             'Dumbbell Bench Press', 'Dumbbell Rows', 'Dumbbell Press', 'Dumbbell Curls',
-            'Dumbbell Flyes', 'Dumbbell Shoulder Press', 'Arnold Press'
+            'Dumbbell Flyes', 'Dumbbell Shoulder Press', 'Arnold Press', 'Bent-over Rows'
         ];
 
         // Equipment and workout types
@@ -1772,8 +1772,8 @@
                 
                 // Get weight progression suggestion
                 const currentExerciseName = exercise.name;
-                const hasWeight = exercise.weight || getRecommendedWeight(currentExerciseName, null, currentWorkout.type, currentWorkout.difficulty);
-                const weightProgressionTip = getWeightProgressionTip(currentExerciseName, currentWorkout.type, currentSet, totalSets);
+                const hasWeight = exercise.weight || getRecommendedWeight(currentExerciseName, null, currentWorkout.type || 'Strength Training', currentWorkout.difficulty || 'Intermediate');
+                const weightProgressionTip = getWeightProgressionTip(currentExerciseName, currentWorkout.type || 'Strength Training', currentSet, totalSets);
                 
                 content.innerHTML = `
                     <div class="header">
@@ -1840,7 +1840,7 @@
                 `;
             } else {
                 const instruction = exerciseInstructions[exercise.name] || exerciseInstructions['Default'];
-                const recommendedWeight = getRecommendedWeight(exercise.name, exercise.weight, currentWorkout.type, currentWorkout.difficulty);
+                const recommendedWeight = getRecommendedWeight(exercise.name, exercise.weight, currentWorkout.type || 'Strength Training', currentWorkout.difficulty || 'Intermediate');
                 const exercisesCompleted = currentExercise;
                 const totalExercises = currentWorkout.exercises.length;
                 const percentComplete = Math.round((exercisesCompleted / totalExercises) * 100);
@@ -2086,45 +2086,63 @@
             const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
                                     'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
             
+            // Find matching exercise in user weights
+            let matchedExercise = null;
+            let maxWeight = 0;
+            
             for (let weightEx of weightExercises) {
-                if (exerciseName.includes(weightEx) && userWeights[weightEx]) {
-                    let maxWeight = userWeights[weightEx];
-                    
-                    // Apply progressive overload if enabled
-                    if (progressiveOverload.enabled && exerciseHistory[exerciseName]) {
-                        const lastDone = new Date(exerciseHistory[exerciseName].lastDone);
-                        const weeksSince = Math.floor((new Date() - lastDone) / (1000 * 60 * 60 * 24 * 7));
-                        const increases = Math.floor(weeksSince / progressiveOverload.weeks);
-                        if (increases > 0) {
-                            maxWeight = Math.round(maxWeight * (1 + (progressiveOverload.percentage / 100 * increases)));
-                        }
-                    }
-                    
-                    // Get the appropriate phase and percentage
-                    const phase = workoutTypeToPhase[workoutType] || "strength";
-                    const phaseData = weightPhases[phase];
-                    
-                    // Select percentage based on difficulty
-                    let percentageIndex = 0;
-                    if (difficulty === 'Advanced') percentageIndex = phaseData.percentages.length - 1;
-                    else if (difficulty === 'Intermediate') percentageIndex = Math.floor(phaseData.percentages.length / 2);
-                    
-                    const percentage = phaseData.percentages[percentageIndex];
-                    let workingWeight = maxWeight * percentage;
-                    
-                    // Round to nearest 2.5 lbs (covers both 2.5 and 5 lb increments)
-                    workingWeight = Math.round(workingWeight / 2.5) * 2.5;
-                    
-                    // Handle dumbbell exercises (per arm)
-                    const isDumbbell = dumbbellExercises.some(ex => exerciseName.includes(ex.replace('Dumbbell ', '')));
-                    if (isDumbbell) {
-                        return `${workingWeight} lbs per arm`;
-                    }
-                    
-                    return `${workingWeight} lbs`;
+                if (userWeights[weightEx] && exerciseName.toLowerCase().includes(weightEx.toLowerCase())) {
+                    matchedExercise = weightEx;
+                    maxWeight = userWeights[weightEx];
+                    console.log(`Found match: ${exerciseName} -> ${weightEx} (${maxWeight} lbs)`);
+                    break;
                 }
             }
-            return null;
+            
+            if (!matchedExercise || !maxWeight) {
+                console.log(`No weight match found for: ${exerciseName}`);
+                return null;
+            }
+            
+            // Don't apply progressive overload to AI-generated recommendations
+            // Only apply it for exercises that have been done before
+            if (progressiveOverload.enabled && exerciseHistory[exerciseName] && exerciseHistory[exerciseName].count > 0) {
+                const lastDone = new Date(exerciseHistory[exerciseName].lastDone);
+                const weeksSince = Math.floor((new Date() - lastDone) / (1000 * 60 * 60 * 24 * 7));
+                const increases = Math.floor(weeksSince / progressiveOverload.weeks);
+                if (increases > 0) {
+                    maxWeight = Math.round(maxWeight * (1 + (progressiveOverload.percentage / 100 * increases)));
+                }
+            }
+            
+            // Get the appropriate phase and percentage
+            const phase = workoutTypeToPhase[workoutType] || "strength";
+            const phaseData = weightPhases[phase];
+            
+            // Select percentage based on difficulty
+            let percentageIndex = 0;
+            if (difficulty === 'Advanced') percentageIndex = phaseData.percentages.length - 1;
+            else if (difficulty === 'Intermediate') percentageIndex = Math.floor(phaseData.percentages.length / 2);
+            
+            const percentage = phaseData.percentages[percentageIndex];
+            let workingWeight = maxWeight * percentage;
+            
+            console.log(`Weight calculation: ${exerciseName}`);
+            console.log(`Max weight: ${maxWeight}, Phase: ${phase}, Difficulty: ${difficulty}`);
+            console.log(`Percentage: ${percentage} (${percentage * 100}%), Working weight before rounding: ${workingWeight}`);
+            
+            // Round to nearest 2.5 lbs (covers both 2.5 and 5 lb increments)
+            workingWeight = Math.round(workingWeight / 2.5) * 2.5;
+            
+            console.log(`Final working weight: ${workingWeight}`);
+            
+            // Handle dumbbell exercises (per arm)
+            const isDumbbell = exerciseName.includes('Dumbbell') || dumbbellExercises.some(ex => exerciseName.includes(ex));
+            if (isDumbbell) {
+                return `${workingWeight} lbs per arm`;
+            }
+            
+            return `${workingWeight} lbs`;
         }
 
         // Workout functions
@@ -2160,10 +2178,16 @@
         }
 
         function completeExercise() {
-            if (!currentWorkout || !currentWorkout.exercises) return;
+            if (!currentWorkout || !currentWorkout.exercises) {
+                console.error('No current workout or exercises found');
+                return;
+            }
             
             const exercise = currentWorkout.exercises[currentExercise];
-            if (!exercise) return;
+            if (!exercise) {
+                console.error('No exercise found at current index:', currentExercise);
+                return;
+            }
             
             const totalSets = exercise.sets || 1;
             
