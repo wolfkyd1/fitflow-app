@@ -269,6 +269,11 @@
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
         
+        .btn-share {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -555,7 +560,7 @@
             font-size: 14px;
         }
         
-        .form-input, .form-select {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e5e7eb;
@@ -566,7 +571,12 @@
             appearance: none;
         }
         
-        .form-input:focus, .form-select:focus {
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -775,6 +785,26 @@
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
         
+        .sharing-section {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+        
+        .share-code-display {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            word-break: break-all;
+            margin: 12px 0;
+            backdrop-filter: blur(10px);
+        }
+        
         /* Responsive Design */
         @media (max-width: 414px) {
             .header { padding-top: calc(50px + env(safe-area-inset-top, 0px)); }
@@ -836,7 +866,7 @@
             .modal-content { background: #374151; color: #f3f4f6; }
             .modal-header h3 { color: #f3f4f6; }
             .form-label { color: #e5e7eb; }
-            .form-input, .form-select { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
+            .form-input, .form-select, .form-textarea { background: #1f2937; color: #f3f4f6; border-color: #4b5563; }
             .equipment-list { background: #1f2937; border-color: #4b5563; }
             .exercise-item { background: #1f2937; border-color: #4b5563; color: #f3f4f6; }
             .exercise-item.dragging { background: #4b5563; }
@@ -1090,6 +1120,231 @@
             loadData();
             showTab('home');
             startTimerLoop();
+        }
+
+        // Sharing functions
+        function exportWorkout(workout) {
+            try {
+                const exportData = {
+                    name: workout.name,
+                    type: workout.type,
+                    duration: workout.duration,
+                    difficulty: workout.difficulty,
+                    equipment: workout.equipment,
+                    calories: workout.calories,
+                    exercises: workout.exercises,
+                    muscleGroups: workout.muscleGroups,
+                    shared: true,
+                    sharedAt: new Date().toISOString()
+                };
+                
+                const encoded = btoa(JSON.stringify(exportData));
+                return `FITFLOW_${encoded}`;
+            } catch (error) {
+                console.error('Export error:', error);
+                return null;
+            }
+        }
+
+        function importWorkout(shareCode) {
+            try {
+                if (!shareCode.startsWith('FITFLOW_')) {
+                    throw new Error('Invalid share code format');
+                }
+                
+                const encoded = shareCode.substring(8);
+                const decoded = atob(encoded);
+                const importData = JSON.parse(decoded);
+                
+                // Validate required fields
+                if (!importData.name || !importData.exercises || !Array.isArray(importData.exercises)) {
+                    throw new Error('Invalid workout data');
+                }
+                
+                // Create new workout with imported data
+                const newWorkout = {
+                    id: Date.now(),
+                    name: `${importData.name} (Shared)`,
+                    type: importData.type || 'Strength Training',
+                    duration: importData.duration || 30,
+                    difficulty: importData.difficulty || 'Intermediate',
+                    equipment: importData.equipment || ['Bodyweight'],
+                    calories: importData.calories || 200,
+                    exercises: importData.exercises,
+                    muscleGroups: importData.muscleGroups || ['Full Body'],
+                    custom: true,
+                    imported: true
+                };
+                
+                customWorkouts.unshift(newWorkout);
+                saveData();
+                return newWorkout;
+            } catch (error) {
+                console.error('Import error:', error);
+                throw new Error('Invalid or corrupted share code');
+            }
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✅ Share code copied to clipboard!');
+                }).catch(() => {
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('✅ Share code copied to clipboard!');
+            } catch (err) {
+                alert('❌ Could not copy to clipboard. Please copy the code manually.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showShareModal(workoutId) {
+            const allWorkouts = [...workouts, ...customWorkouts];
+            const workout = allWorkouts.find(w => w.id === workoutId);
+            if (!workout) return;
+
+            if (!workout.custom && !workout.aiGenerated) {
+                alert('⚠️ Only custom and AI-generated workouts can be shared.');
+                return;
+            }
+
+            const shareCode = exportWorkout(workout);
+            if (!shareCode) {
+                alert('❌ Failed to generate share code.');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'shareModal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>🔗 Share Workout</h3>
+                        <button class="close-btn" onclick="closeModal('shareModal')">&times;</button>
+                    </div>
+                    
+                    <p style="color: #6b7280; margin-bottom: 16px;">
+                        Share this workout with friends by copying the code below:
+                    </p>
+                    
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                color: white; 
+                                padding: 16px; 
+                                border-radius: 12px; 
+                                margin-bottom: 16px;">
+                        <h4 style="margin-bottom: 8px;">${workout.name}</h4>
+                        <p style="opacity: 0.9; font-size: 14px;">
+                            ${workout.type} • ${workout.duration}min • ${workout.exercises.length} exercises
+                        </p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Share Code</label>
+                        <div class="share-code-display" onclick="selectText(this)">
+                            ${shareCode}
+                        </div>
+                        <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                            Click on the code to select it, then copy and share with others
+                        </p>
+                    </div>
+                    
+                    <button class="btn btn-share" onclick="copyToClipboard('${shareCode}')">
+                        📋 Copy to Clipboard
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function showImportModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'importModal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📥 Import Workout</h3>
+                        <button class="close-btn" onclick="closeModal('importModal')">&times;</button>
+                    </div>
+                    
+                    <p style="color: #6b7280; margin-bottom: 16px;">
+                        Paste a share code from another FitFlow user to import their workout:
+                    </p>
+                    
+                    <form id="importForm">
+                        <div class="form-group">
+                            <label class="form-label">Share Code</label>
+                            <textarea id="share-code-input" 
+                                    class="form-textarea" 
+                                    placeholder="Paste share code here (starts with FITFLOW_)"
+                                    required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">
+                            📥 Import Workout
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('importForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleImportWorkout();
+            });
+        }
+
+        function handleImportWorkout() {
+            const shareCode = document.getElementById('share-code-input').value.trim();
+            
+            if (!shareCode) {
+                alert('❌ Please enter a share code.');
+                return;
+            }
+            
+            try {
+                const importedWorkout = importWorkout(shareCode);
+                closeModal('importModal');
+                showHomeTab();
+                alert(`✅ Successfully imported "${importedWorkout.name}"!`);
+            } catch (error) {
+                alert(`❌ Import failed: ${error.message}`);
+            }
+        }
+
+        function selectText(element) {
+            if (document.selection) {
+                const range = document.body.createTextRange();
+                range.moveToElementText(element);
+                range.select();
+            } else if (window.getSelection) {
+                const range = document.createRange();
+                range.selectNode(element);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+            }
         }
 
         // Quick Start rotation functions
@@ -1407,6 +1662,7 @@
                             <div class="workout-title">
                                 ${workout.name}
                                 ${workout.aiGenerated ? ' 🤖' : ''}
+                                ${workout.imported ? ' 📥' : ''}
                                 ${workout.custom ? ` <button onclick="deleteWorkout(${workout.id})" style="background: none; border: none; color: #ef4444; cursor: pointer; float: right;">🗑️</button>` : ''}
                             </div>
                             <div class="workout-info">
@@ -1418,10 +1674,11 @@
                             <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">
                                 Equipment: ${Array.isArray(workout.equipment) ? workout.equipment[0] : workout.equipment} • ~${workout.calories} cal
                             </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})">Details</button>
-                                ${workout.custom || workout.aiGenerated ? `<button class="btn btn-warning" onclick="editWorkout(${workout.id})">Edit</button>` : ''}
-                                <button class="btn btn-success" onclick="startWorkout(${workout.id})">Start</button>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})" style="flex: 1; min-width: 70px;">Details</button>
+                                ${workout.custom || workout.aiGenerated ? `<button class="btn btn-warning" onclick="editWorkout(${workout.id})" style="flex: 1; min-width: 70px;">Edit</button>` : ''}
+                                ${workout.custom || workout.aiGenerated ? `<button class="btn btn-share" onclick="showShareModal(${workout.id})" style="flex: 1; min-width: 70px;">Share</button>` : ''}
+                                <button class="btn btn-success" onclick="startWorkout(${workout.id})" style="flex: 1; min-width: 70px;">Start</button>
                             </div>
                         </div>
                     `).join('')}
@@ -1680,6 +1937,21 @@
                             <div style="font-size: 14px; opacity: 0.9;">Current Streak</div>
                         </div>
                     ` : ''}
+
+                    <div class="sharing-section">
+                        <h3 style="margin-bottom: 12px; display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">🔗</span> Share & Import Workouts
+                        </h3>
+                        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 16px;">
+                            Share your custom workouts or import workouts from other FitFlow users
+                        </p>
+                        <button class="btn" style="background: white; color: #06b6d4; margin-bottom: 8px;" onclick="showImportModal()">
+                            📥 Import Workout
+                        </button>
+                        <p style="font-size: 12px; opacity: 0.8;">
+                            You can share individual workouts from the home screen using the Share button
+                        </p>
+                    </div>
 
                     <div class="weight-tracker">
                         <h3 style="margin-bottom: 12px;">💪 Your Max Weights</h3>
@@ -2559,7 +2831,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>${workout.name} ${workout.aiGenerated ? '🤖' : ''}</h3>
+                        <h3>${workout.name} ${workout.aiGenerated ? '🤖' : ''} ${workout.imported ? '📥' : ''}</h3>
                         <button class="close-btn" onclick="closeModal('detailsModal')">&times;</button>
                     </div>
                     
