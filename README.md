@@ -69,6 +69,14 @@ Gesture-Friendly: Smooth scrolling and touch interactions</br>
 PWA Support: Install as a native app with offline capabilities</br>
 Responsive Layout: Works perfectly on phones, tablets, and desktops</br>
 
+🔗 Import and Export your AI-generated and Custom Workouts
+
+Simply click the share button on your workout</br>
+Scroll down and click "Copy to Clipboard"</br>
+Send the code to your friends</br>
+On the other device, go to Profile -> Import Workout -> paste the code</br>
+It should automatically add it to your Home Page</br>
+
 📱 Installing FitFlow on iPhone
 
 Open Safari on your iPhone</br>
