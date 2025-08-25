@@ -2084,32 +2084,62 @@
         function getRecommendedWeight(exerciseName, currentWeight, workoutType = 'Strength Training', difficulty = 'Intermediate') {
             if (currentWeight) return currentWeight;
             
-            const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
-                                    'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
+            // Order matters! More specific exercises first to avoid incorrect matches
+            const weightExercises = ['Dumbbell Bench Press', 'Bench Press', 'Bent-over Rows', 'Overhead Press', 
+                                    'Bicep Curls', 'Squats', 'Deadlifts', 'Leg Press'];
             
-            // Find matching exercise in user weights
+            // Find matching exercise in user weights - prioritize exact matches
             let matchedExercise = null;
             let maxWeight = 0;
             
-            for (let weightEx of weightExercises) {
-                if (userWeights[weightEx] && exerciseName.toLowerCase().includes(weightEx.toLowerCase())) {
-                    matchedExercise = weightEx;
-                    maxWeight = userWeights[weightEx];
-                    break;
+            // First try exact match
+            if (userWeights[exerciseName] && userWeights[exerciseName] > 0) {
+                matchedExercise = exerciseName;
+                maxWeight = userWeights[exerciseName];
+                console.log(`Exact match found: ${exerciseName} = ${maxWeight} lbs`);
+            } else {
+                // Then try contains match, but be more specific
+                for (let weightEx of weightExercises) {
+                    if (userWeights[weightEx] && userWeights[weightEx] > 0) {
+                        // For dumbbell exercises, only match if both contain "dumbbell"
+                        if (weightEx.includes('Dumbbell') && exerciseName.includes('Dumbbell')) {
+                            if (exerciseName.toLowerCase().includes(weightEx.toLowerCase().replace('dumbbell ', ''))) {
+                                matchedExercise = weightEx;
+                                maxWeight = userWeights[weightEx];
+                                console.log(`Dumbbell match found: ${exerciseName} matched to ${weightEx} = ${maxWeight} lbs`);
+                                break;
+                            }
+                        }
+                        // For non-dumbbell exercises, ensure both don't contain "dumbbell"
+                        else if (!weightEx.includes('Dumbbell') && !exerciseName.includes('Dumbbell')) {
+                            if (exerciseName.toLowerCase().includes(weightEx.toLowerCase())) {
+                                matchedExercise = weightEx;
+                                maxWeight = userWeights[weightEx];
+                                console.log(`Standard match found: ${exerciseName} matched to ${weightEx} = ${maxWeight} lbs`);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             
             if (!matchedExercise || !maxWeight) {
+                console.log(`No weight match found for: ${exerciseName}`);
                 return null;
             }
             
+            console.log(`Using ${matchedExercise}: ${maxWeight} lbs for ${exerciseName}`);
+            
             // Apply progressive overload if enabled and exercise has history
+            let originalWeight = maxWeight;
             if (progressiveOverload.enabled && exerciseHistory[exerciseName] && exerciseHistory[exerciseName].count > 0) {
                 const lastDone = new Date(exerciseHistory[exerciseName].lastDone);
                 const weeksSince = Math.floor((new Date() - lastDone) / (1000 * 60 * 60 * 24 * 7));
                 const increases = Math.floor(weeksSince / progressiveOverload.weeks);
                 if (increases > 0) {
-                    maxWeight = Math.round(maxWeight * (1 + (progressiveOverload.percentage / 100 * increases)));
+                    const multiplier = 1 + (progressiveOverload.percentage / 100 * increases);
+                    maxWeight = Math.round(maxWeight * multiplier);
+                    console.log(`Progressive overload applied: ${originalWeight} * ${multiplier.toFixed(2)} = ${maxWeight} lbs`);
                 }
             }
             
@@ -2125,15 +2155,21 @@
             const percentage = phaseData.percentages[percentageIndex];
             let workingWeight = maxWeight * percentage;
             
+            console.log(`Weight calculation: ${maxWeight} (max) * ${percentage} (${phase}/${difficulty}) = ${workingWeight.toFixed(1)} lbs`);
+            
             // Round to nearest 2.5 lbs (covers both 2.5 and 5 lb increments)
             workingWeight = Math.round(workingWeight / 2.5) * 2.5;
+            
+            console.log(`Rounded working weight: ${workingWeight} lbs`);
             
             // Handle dumbbell exercises (per arm)
             const isDumbbell = exerciseName.includes('Dumbbell') || dumbbellExercises.some(ex => exerciseName.includes(ex));
             if (isDumbbell) {
+                console.log(`Dumbbell exercise detected: ${exerciseName} -> ${workingWeight} lbs per arm`);
                 return `${workingWeight} lbs per arm`;
             }
             
+            console.log(`Final recommendation: ${workingWeight} lbs`);
             return `${workingWeight} lbs`;
         }
 
