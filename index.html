@@ -14,6 +14,34 @@
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
         }
+
+        // Get weight progression tips during rest
+        function getWeightProgressionTip(exerciseName, workoutType, currentSet, totalSets) {
+            const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
+                                    'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
+            
+            const hasWeight = weightExercises.some(ex => exerciseName.includes(ex));
+            if (!hasWeight) return null;
+            
+            const phase = workoutTypeToPhase[workoutType] || "strength";
+            
+            if (currentSet === Math.floor(totalSets / 2)) {
+                switch (phase) {
+                    case 'strength':
+                        return "If completing all reps easily, increase weight by 2.5-5lbs next workout.";
+                    case 'hypertrophy':
+                        return "Focus on muscle fatigue. If last 2 reps aren't challenging, add weight.";
+                    case 'power':
+                        return "Maintain explosive movement. Only increase weight if speed doesn't decrease.";
+                    case 'deload':
+                        return "Keep weight light. Focus on perfect form and recovery.";
+                }
+            } else if (currentSet === totalSets) {
+                return "Great work! Track how the last set felt to adjust weight next time.";
+            }
+            
+            return null;
+        }
         
         input, textarea, select {
             -webkit-user-select: text;
@@ -90,8 +118,8 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 0 20px 16px 20px;
-            padding-top: calc(44px + env(safe-area-inset-top, 0px));
+            padding: 0 20px 12px 20px;
+            padding-top: calc(20px + env(safe-area-inset-top, 0px));
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
@@ -105,7 +133,7 @@
         /* Fallback for older browsers */
         @supports not (padding-top: env(safe-area-inset-top)) {
             .header {
-                padding-top: 60px;
+                padding-top: 35px;
             }
         }
         
@@ -807,13 +835,13 @@
         
         /* Responsive Design */
         @media (max-width: 414px) {
-            .header { padding-top: calc(50px + env(safe-area-inset-top, 0px)); }
+            .header { padding-top: calc(25px + env(safe-area-inset-top, 0px)); }
         }
         
         @media (max-width: 390px) {
             .header h1 { font-size: 24px; }
             .header p { font-size: 12px; }
-            .header { padding-bottom: 16px; }
+            .header { padding-bottom: 10px; }
             .timer { font-size: 48px; }
             .exercise-name { font-size: 22px; }
             .stat-number { font-size: 24px; }
@@ -835,7 +863,7 @@
         
         /* iPhone Pro Max and larger phones */
         @media (min-width: 428px) {
-            .header { padding-top: calc(48px + env(safe-area-inset-top, 0px)); }
+            .header { padding-top: calc(25px + env(safe-area-inset-top, 0px)); }
         }
         
         /* Desktop and tablets */
@@ -931,6 +959,31 @@
             percentage: 5,
             weeks: 2
         };
+
+        // Weight training phases and percentages
+        const weightPhases = {
+            "hypertrophy": {"percentages": [0.65, 0.7, 0.75], "sets_reps": [[4,10], [5,8], [6,8]]},
+            "strength": {"percentages": [0.75, 0.8, 0.85], "sets_reps": [[4,6], [5,5], [5,4]]},
+            "power": {"percentages": [0.85, 0.9, 0.95], "sets_reps": [[3,4], [4,3], [5,2]]},
+            "deload": {"percentages": [0.5, 0.6], "sets_reps": [[2,8], [3,5]]}
+        };
+
+        // Workout type to phase mapping
+        const workoutTypeToPhase = {
+            "Strength Training": "strength",
+            "Powerlifting": "strength", 
+            "Bodybuilding": "hypertrophy",
+            "HIIT": "power",
+            "CrossFit": "power",
+            "Functional Training": "strength",
+            "Circuit Training": "hypertrophy"
+        };
+
+        // Dumbbell exercises (per arm)
+        const dumbbellExercises = [
+            'Dumbbell Bench Press', 'Dumbbell Rows', 'Dumbbell Press', 'Dumbbell Curls',
+            'Dumbbell Flyes', 'Dumbbell Shoulder Press', 'Arnold Press'
+        ];
 
         // Equipment and workout types
         const equipmentOptions = [
@@ -1717,6 +1770,11 @@
                 const actualSetsRemaining = isRestingBetweenSets ? (totalSets - currentSet + 1) : 0;
                 const nextExercise = currentWorkout.exercises[currentExercise + 1];
                 
+                // Get weight progression suggestion
+                const currentExerciseName = exercise.name;
+                const hasWeight = exercise.weight || getRecommendedWeight(currentExerciseName, null, currentWorkout.type, currentWorkout.difficulty);
+                const weightProgressionTip = getWeightProgressionTip(currentExerciseName, currentWorkout.type, currentSet, totalSets);
+                
                 content.innerHTML = `
                     <div class="header">
                         <h1>💪 FitFlow</h1>
@@ -1761,7 +1819,14 @@
                                 </strong>
                             </div>
                             
-                            <button class="btn" style="background: white; color: #f59e0b; margin-top: 24px; font-size: 16px; padding: 16px;" onclick="skipRest()">
+                            ${weightProgressionTip ? `
+                                <div style="background: rgba(139, 92, 246, 0.2); padding: 12px; border-radius: 10px; margin-top: 16px;">
+                                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">💪 Weight Tip:</div>
+                                    <div style="font-size: 13px; opacity: 0.95;">${weightProgressionTip}</div>
+                                </div>
+                            ` : ''}
+                            
+                            <button class="btn" style="background: white; color: #f59e0b; margin-top: 24px; font-size: 16px; padding: 16px;" onclick="skipRest()">>
                                 Skip Rest ⭐
                             </button>
                         </div>
@@ -1775,7 +1840,7 @@
                 `;
             } else {
                 const instruction = exerciseInstructions[exercise.name] || exerciseInstructions['Default'];
-                const recommendedWeight = getRecommendedWeight(exercise.name, exercise.weight);
+                const recommendedWeight = getRecommendedWeight(exercise.name, exercise.weight, currentWorkout.type, currentWorkout.difficulty);
                 const exercisesCompleted = currentExercise;
                 const totalExercises = currentWorkout.exercises.length;
                 const percentComplete = Math.round((exercisesCompleted / totalExercises) * 100);
@@ -1964,7 +2029,7 @@
                                 ${Object.entries(userWeights).slice(0, 4).map(([exercise, weight]) => `
                                     <div class="weight-item">
                                         <div class="weight-label">${exercise}</div>
-                                        <div class="weight-value">${weight} lbs</div>
+                                        <div class="weight-value">${weight} ${exercise.includes('Dumbbell') ? 'lbs/arm' : 'lbs'}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -2014,8 +2079,8 @@
             `;
         }
 
-        // Get recommended weight with progressive overload
-        function getRecommendedWeight(exerciseName, currentWeight) {
+        // Get recommended weight with proper percentage-based system
+        function getRecommendedWeight(exerciseName, currentWeight, workoutType = 'Strength Training', difficulty = 'Intermediate') {
             if (currentWeight) return currentWeight;
             
             const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
@@ -2035,8 +2100,28 @@
                         }
                     }
                     
-                    const workingWeight = Math.round(maxWeight * 0.7 / 5) * 5; // 70% of max, rounded to nearest 5
-                    return `${workingWeight}-${workingWeight + 10} lbs`;
+                    // Get the appropriate phase and percentage
+                    const phase = workoutTypeToPhase[workoutType] || "strength";
+                    const phaseData = weightPhases[phase];
+                    
+                    // Select percentage based on difficulty
+                    let percentageIndex = 0;
+                    if (difficulty === 'Advanced') percentageIndex = phaseData.percentages.length - 1;
+                    else if (difficulty === 'Intermediate') percentageIndex = Math.floor(phaseData.percentages.length / 2);
+                    
+                    const percentage = phaseData.percentages[percentageIndex];
+                    let workingWeight = maxWeight * percentage;
+                    
+                    // Round to nearest 2.5 lbs (covers both 2.5 and 5 lb increments)
+                    workingWeight = Math.round(workingWeight / 2.5) * 2.5;
+                    
+                    // Handle dumbbell exercises (per arm)
+                    const isDumbbell = dumbbellExercises.some(ex => exerciseName.includes(ex.replace('Dumbbell ', '')));
+                    if (isDumbbell) {
+                        return `${workingWeight} lbs per arm`;
+                    }
+                    
+                    return `${workingWeight} lbs`;
                 }
             }
             return null;
@@ -2286,7 +2371,7 @@
                 let exercise = { name: exerciseName };
                 
                 // Get recommended weight if applicable
-                const recommendedWeight = getRecommendedWeight(exerciseName);
+                const recommendedWeight = getRecommendedWeight(exerciseName, null, preferences.type, preferences.difficulty);
                 
                 switch (preferences.type) {
                     case 'HIIT':
@@ -2297,10 +2382,30 @@
                     case 'Strength Training':
                     case 'Powerlifting':
                     case 'Bodybuilding':
+                    case 'Functional Training':
+                        // Use phase-based sets and reps
+                        const phase = workoutTypeToPhase[preferences.type] || "strength";
+                        const phaseData = weightPhases[phase];
+                        
+                        // Select sets/reps based on difficulty
+                        let setsRepsIndex = 0;
+                        if (preferences.difficulty === 'Advanced') setsRepsIndex = phaseData.sets_reps.length - 1;
+                        else if (preferences.difficulty === 'Intermediate') setsRepsIndex = Math.floor(phaseData.sets_reps.length / 2);
+                        
+                        const [sets, reps] = phaseData.sets_reps[setsRepsIndex];
+                        exercise.sets = sets;
+                        exercise.reps = reps.toString();
+                        exercise.rest = preferences.type === 'Powerlifting' ? 180 : 
+                                       preferences.type === 'Strength Training' ? 120 : 90;
+                        
+                        if (recommendedWeight) exercise.weight = recommendedWeight;
+                        break;
+                    case 'CrossFit':
+                        exercise.duration = [45, 60][Math.floor(Math.random() * 2)];
+                        exercise.rest = [30, 45][Math.floor(Math.random() * 2)];
                         exercise.reps = preferences.difficulty === 'Beginner' ? '8-12' : 
-                                       preferences.difficulty === 'Advanced' ? '5-8' : '6-10';
-                        exercise.sets = preferences.difficulty === 'Advanced' ? 4 : 3;
-                        exercise.rest = [60, 75, 90][Math.floor(Math.random() * 3)];
+                                       preferences.difficulty === 'Advanced' ? '15-20' : '10-15';
+                        exercise.sets = 3;
                         if (recommendedWeight) exercise.weight = recommendedWeight;
                         break;
                     case 'Yoga':
@@ -2413,8 +2518,16 @@
             modal.className = 'modal';
             modal.id = 'weightModal';
             
-            const commonExercises = ['Bench Press', 'Squats', 'Deadlifts', 'Overhead Press', 
-                                    'Bent-over Rows', 'Bicep Curls', 'Dumbbell Bench Press', 'Leg Press'];
+            const commonExercises = [
+                {name: 'Bench Press', unit: 'lbs'}, 
+                {name: 'Squats', unit: 'lbs'}, 
+                {name: 'Deadlifts', unit: 'lbs'}, 
+                {name: 'Overhead Press', unit: 'lbs'},
+                {name: 'Bent-over Rows', unit: 'lbs'}, 
+                {name: 'Bicep Curls', unit: 'lbs'}, 
+                {name: 'Dumbbell Bench Press', unit: 'lbs per arm'}, 
+                {name: 'Leg Press', unit: 'lbs'}
+            ];
             
             modal.innerHTML = `
                 <div class="modal-content">
@@ -2423,20 +2536,28 @@
                         <button class="close-btn" onclick="closeModal('weightModal')">&times;</button>
                     </div>
                     <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
-                        Enter your one-rep max (1RM) for each exercise. AI workouts will use 60-80% of these values.
+                        Enter your one-rep max (1RM) for each exercise. AI workouts will use sport-specific percentages based on workout type.
                     </p>
                     <form id="weightForm">
                         ${commonExercises.map(exercise => `
                             <div class="form-group">
-                                <label class="form-label">${exercise} (lbs)</label>
+                                <label class="form-label">${exercise.name} (${exercise.unit})</label>
                                 <input type="number" 
-                                       id="weight-${exercise.replace(/\s+/g, '-')}" 
+                                       id="weight-${exercise.name.replace(/\s+/g, '-')}" 
                                        class="form-input" 
-                                       placeholder="Enter max weight"
-                                       value="${userWeights[exercise] || ''}"
+                                       placeholder="Enter max weight ${exercise.unit === 'lbs per arm' ? 'per arm' : ''}"
+                                       value="${userWeights[exercise.name] || ''}"
                                        min="0">
                             </div>
                         `).join('')}
+                        <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 12px; padding: 16px; margin: 16px 0;">
+                            <h4 style="color: #0c4a6e; margin-bottom: 8px;">💡 How AI Uses Your Weights:</h4>
+                            <ul style="color: #075985; font-size: 14px; margin: 0; padding-left: 20px;">
+                                <li><strong>Strength:</strong> 75-85% of 1RM (4-5 sets of 4-6 reps)</li>
+                                <li><strong>Hypertrophy:</strong> 65-75% of 1RM (4-6 sets of 8-10 reps)</li>
+                                <li><strong>Power:</strong> 85-95% of 1RM (3-5 sets of 2-4 reps)</li>
+                            </ul>
+                        </div>
                         <button type="submit" class="btn">💾 Save Weights</button>
                     </form>
                 </div>
@@ -2451,8 +2572,10 @@
         }
 
         function handleWeightUpdate() {
-            const commonExercises = ['Bench Press', 'Squats', 'Deadlifts', 'Overhead Press', 
-                                    'Bent-over Rows', 'Bicep Curls', 'Dumbbell Bench Press', 'Leg Press'];
+            const commonExercises = [
+                'Bench Press', 'Squats', 'Deadlifts', 'Overhead Press', 
+                'Bent-over Rows', 'Bicep Curls', 'Dumbbell Bench Press', 'Leg Press'
+            ];
             
             commonExercises.forEach(exercise => {
                 const input = document.getElementById(`weight-${exercise.replace(/\s+/g, '-')}`);
