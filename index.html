@@ -14,34 +14,6 @@
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
         }
-
-        // Get weight progression tips during rest
-        function getWeightProgressionTip(exerciseName, workoutType, currentSet, totalSets) {
-            const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
-                                    'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
-            
-            const hasWeight = weightExercises.some(ex => exerciseName.includes(ex));
-            if (!hasWeight) return null;
-            
-            const phase = workoutTypeToPhase[workoutType] || "strength";
-            
-            if (currentSet === Math.floor(totalSets / 2)) {
-                switch (phase) {
-                    case 'strength':
-                        return "If completing all reps easily, increase weight by 2.5-5lbs next workout.";
-                    case 'hypertrophy':
-                        return "Focus on muscle fatigue. If last 2 reps aren't challenging, add weight.";
-                    case 'power':
-                        return "Maintain explosive movement. Only increase weight if speed doesn't decrease.";
-                    case 'deload':
-                        return "Keep weight light. Focus on perfect form and recovery.";
-                }
-            } else if (currentSet === totalSets) {
-                return "Great work! Track how the last set felt to adjust weight next time.";
-            }
-            
-            return null;
-        }
         
         input, textarea, select {
             -webkit-user-select: text;
@@ -960,7 +932,7 @@
             weeks: 2
         };
 
-        // Weight training phases and percentages
+        // Weight training phases and percentages (FIXED)
         const weightPhases = {
             "hypertrophy": {"percentages": [0.65, 0.7, 0.75], "sets_reps": [[4,10], [5,8], [6,8]]},
             "strength": {"percentages": [0.75, 0.8, 0.85], "sets_reps": [[4,6], [5,5], [5,4]]},
@@ -1167,6 +1139,34 @@
             }
         ];
 
+        // Get weight progression tips during rest (FIXED)
+        function getWeightProgressionTip(exerciseName, workoutType, currentSet, totalSets) {
+            const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
+                                    'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
+            
+            const hasWeight = weightExercises.some(ex => exerciseName.includes(ex));
+            if (!hasWeight) return null;
+            
+            const phase = workoutTypeToPhase[workoutType] || "strength";
+            
+            if (currentSet === Math.floor(totalSets / 2)) {
+                switch (phase) {
+                    case 'strength':
+                        return "If completing all reps easily, increase weight by 2.5-5lbs next workout.";
+                    case 'hypertrophy':
+                        return "Focus on muscle fatigue. If last 2 reps aren't challenging, add weight.";
+                    case 'power':
+                        return "Maintain explosive movement. Only increase weight if speed doesn't decrease.";
+                    case 'deload':
+                        return "Keep weight light. Focus on perfect form and recovery.";
+                }
+            } else if (currentSet === totalSets) {
+                return "Great work! Track how the last set felt to adjust weight next time.";
+            }
+            
+            return null;
+        }
+
         // Initialize app
         function init() {
             workouts = predefinedWorkouts;
@@ -1263,7 +1263,7 @@
                 document.execCommand('copy');
                 alert('✅ Share code copied to clipboard!');
             } catch (err) {
-                alert('❌ Could not copy to clipboard. Please copy the code manually.');
+                alert('⚠ Could not copy to clipboard. Please copy the code manually.');
             }
             document.body.removeChild(textArea);
         }
@@ -1280,7 +1280,7 @@
 
             const shareCode = exportWorkout(workout);
             if (!shareCode) {
-                alert('❌ Failed to generate share code.');
+                alert('⚠ Failed to generate share code.');
                 return;
             }
 
@@ -1373,7 +1373,7 @@
             const shareCode = document.getElementById('share-code-input').value.trim();
             
             if (!shareCode) {
-                alert('❌ Please enter a share code.');
+                alert('⚠ Please enter a share code.');
                 return;
             }
             
@@ -1383,7 +1383,7 @@
                 showHomeTab();
                 alert(`✅ Successfully imported "${importedWorkout.name}"!`);
             } catch (error) {
-                alert(`❌ Import failed: ${error.message}`);
+                alert(`⚠ Import failed: ${error.message}`);
             }
         }
 
@@ -1547,6 +1547,7 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
+        // FIXED: Timer loop with proper state management
         function startTimerLoop() {
             setInterval(() => {
                 if (isTimerRunning && workoutInProgress && !isResting) {
@@ -1826,7 +1827,7 @@
                                 </div>
                             ` : ''}
                             
-                            <button class="btn" style="background: white; color: #f59e0b; margin-top: 24px; font-size: 16px; padding: 16px;" onclick="skipRest()">>
+                            <button class="btn" style="background: white; color: #f59e0b; margin-top: 24px; font-size: 16px; padding: 16px;" onclick="skipRest()">
                                 Skip Rest ⭐
                             </button>
                         </div>
@@ -2079,7 +2080,7 @@
             `;
         }
 
-        // Get recommended weight with proper percentage-based system
+        // FIXED: Get recommended weight with proper percentage-based system
         function getRecommendedWeight(exerciseName, currentWeight, workoutType = 'Strength Training', difficulty = 'Intermediate') {
             if (currentWeight) return currentWeight;
             
@@ -2094,18 +2095,15 @@
                 if (userWeights[weightEx] && exerciseName.toLowerCase().includes(weightEx.toLowerCase())) {
                     matchedExercise = weightEx;
                     maxWeight = userWeights[weightEx];
-                    console.log(`Found match: ${exerciseName} -> ${weightEx} (${maxWeight} lbs)`);
                     break;
                 }
             }
             
             if (!matchedExercise || !maxWeight) {
-                console.log(`No weight match found for: ${exerciseName}`);
                 return null;
             }
             
-            // Don't apply progressive overload to AI-generated recommendations
-            // Only apply it for exercises that have been done before
+            // Apply progressive overload if enabled and exercise has history
             if (progressiveOverload.enabled && exerciseHistory[exerciseName] && exerciseHistory[exerciseName].count > 0) {
                 const lastDone = new Date(exerciseHistory[exerciseName].lastDone);
                 const weeksSince = Math.floor((new Date() - lastDone) / (1000 * 60 * 60 * 24 * 7));
@@ -2127,14 +2125,8 @@
             const percentage = phaseData.percentages[percentageIndex];
             let workingWeight = maxWeight * percentage;
             
-            console.log(`Weight calculation: ${exerciseName}`);
-            console.log(`Max weight: ${maxWeight}, Phase: ${phase}, Difficulty: ${difficulty}`);
-            console.log(`Percentage: ${percentage} (${percentage * 100}%), Working weight before rounding: ${workingWeight}`);
-            
             // Round to nearest 2.5 lbs (covers both 2.5 and 5 lb increments)
             workingWeight = Math.round(workingWeight / 2.5) * 2.5;
-            
-            console.log(`Final working weight: ${workingWeight}`);
             
             // Handle dumbbell exercises (per arm)
             const isDumbbell = exerciseName.includes('Dumbbell') || dumbbellExercises.some(ex => exerciseName.includes(ex));
@@ -2172,13 +2164,16 @@
             }, 100);
         }
 
+        // FIXED: Toggle timer function
         function toggleTimer() {
+            if (isResting) return; // Don't allow timer toggle during rest
             isTimerRunning = !isTimerRunning;
-            showWorkoutTab();
+            showWorkoutTab(); // Refresh the UI to show the correct button state
         }
 
+        // FIXED: Complete exercise function
         function completeExercise() {
-            if (!currentWorkout || !currentWorkout.exercises) {
+            if (!currentWorkout || !currentWorkout.exercises || !workoutInProgress) {
                 console.error('No current workout or exercises found');
                 return;
             }
@@ -2193,25 +2188,25 @@
             
             if (currentSet < totalSets) {
                 // More sets remaining for this exercise
-                if (exercise.rest > 0) {
+                currentSet++;
+                if (exercise.rest && exercise.rest > 0) {
                     isResting = true;
                     restTimer = exercise.rest;
                     isTimerRunning = false;
                     playDingSound();
                 }
-                currentSet++;
             } else {
                 // Completed all sets for this exercise
                 if (currentExercise < currentWorkout.exercises.length - 1) {
                     // Move to next exercise
-                    if (exercise.rest > 0) {
+                    currentExercise++;
+                    currentSet = 1;
+                    if (exercise.rest && exercise.rest > 0) {
                         isResting = true;
                         restTimer = exercise.rest;
                         isTimerRunning = false;
                         playDingSound();
                     }
-                    currentExercise++;
-                    currentSet = 1;
                 } else {
                     // Workout complete
                     completeWorkout();
