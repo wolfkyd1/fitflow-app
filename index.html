@@ -90,8 +90,8 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 0 20px 12px 20px;
-            padding-top: calc(20px + env(safe-area-inset-top, 0px));
+            padding: 0 20px 16px 20px;
+            padding-top: calc(16px + env(safe-area-inset-top, 0px));
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
@@ -105,7 +105,7 @@
         /* Fallback for older browsers */
         @supports not (padding-top: env(safe-area-inset-top)) {
             .header {
-                padding-top: 35px;
+                padding-top: 28px;
             }
         }
         
@@ -807,13 +807,13 @@
         
         /* Responsive Design */
         @media (max-width: 414px) {
-            .header { padding-top: calc(25px + env(safe-area-inset-top, 0px)); }
+            .header { padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
         }
         
         @media (max-width: 390px) {
             .header h1 { font-size: 24px; }
             .header p { font-size: 12px; }
-            .header { padding-bottom: 10px; }
+            .header { padding-bottom: 12px; }
             .timer { font-size: 48px; }
             .exercise-name { font-size: 22px; }
             .stat-number { font-size: 24px; }
@@ -835,7 +835,7 @@
         
         /* iPhone Pro Max and larger phones */
         @media (min-width: 428px) {
-            .header { padding-top: calc(25px + env(safe-area-inset-top, 0px)); }
+            .header { padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
         }
         
         /* Desktop and tablets */
