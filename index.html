@@ -862,7 +862,7 @@
             .nav-item { color: #9ca3af; }
             .detail-card { background: linear-gradient(135deg, #4b5563, #374151); color: #f3f4f6; }
             .detail-card strong { color: #f3f4f6; }
-            .exercise-description { background: #374151; color: #000000; border-color: #4b5563; }
+            .exercise-description { background: #374151; color: #f3f4f6; border-color: #4b5563; }
             .modal-content { background: #374151; color: #f3f4f6; }
             .modal-header h3 { color: #f3f4f6; }
             .form-label { color: #e5e7eb; }
@@ -931,8 +931,12 @@
             percentage: 5,
             weeks: 2
         };
+        let userBody = {
+            weight: 0, // in lbs
+            height: 0  // in inches
+        };
 
-        // Weight training phases and percentages (FIXED)
+        // Weight training phases and percentages
         const weightPhases = {
             "hypertrophy": {"percentages": [0.65, 0.7, 0.75], "sets_reps": [[4,10], [5,8], [6,8]]},
             "strength": {"percentages": [0.75, 0.8, 0.85], "sets_reps": [[4,6], [5,5], [5,4]]},
@@ -950,6 +954,49 @@
             "Functional Training": "strength",
             "Circuit Training": "hypertrophy"
         };
+
+        // METS values for different workout types (Metabolic Equivalent of Task)
+        const workoutMETS = {
+            "Strength Training": 5.0,
+            "HIIT": 10.0,
+            "Cardio": 8.5,
+            "Yoga": 3.0,
+            "Pilates": 4.5,
+            "CrossFit": 12.0,
+            "Powerlifting": 6.0,
+            "Bodybuilding": 5.5,
+            "Calisthenics": 6.5,
+            "Functional Training": 7.0,
+            "Circuit Training": 9.0,
+            "Endurance": 8.0,
+            "Flexibility": 2.5,
+            "Core": 4.0
+        };
+
+        // Calculate calories burned using METS formula
+        function calculateCalories(workoutType, durationMinutes, difficulty = 'Intermediate') {
+            if (!userBody.weight || userBody.weight <= 0) {
+                // Fallback to estimated values if no weight provided
+                const baseCalories = workoutType === 'HIIT' || workoutType === 'Cardio' ? 10 : 
+                                  workoutType === 'Strength Training' ? 8 : 5;
+                return Math.floor(durationMinutes * baseCalories * 
+                       (difficulty === 'Advanced' ? 1.2 : 
+                        difficulty === 'Beginner' ? 0.8 : 1));
+            }
+            
+            const weightInKg = userBody.weight * 0.453592; // Convert lbs to kg
+            const mets = workoutMETS[workoutType] || 5.0;
+            
+            // Adjust METS by difficulty
+            const difficultyMultiplier = difficulty === 'Advanced' ? 1.2 : 
+                                       difficulty === 'Beginner' ? 0.8 : 1.0;
+            const adjustedMets = mets * difficultyMultiplier;
+            
+            // Formula: Duration (min) x METS x 3.5 x weight in kg / 200
+            const calories = (durationMinutes * adjustedMets * 3.5 * weightInKg) / 200;
+            
+            return Math.floor(calories);
+        }
 
         // Dumbbell exercises (per arm)
         const dumbbellExercises = [
@@ -1086,7 +1133,7 @@
             'Default': 'Perform the exercise with proper form, focusing on controlled movements and full range of motion. Maintain proper breathing throughout.'
         };
 
-        // Predefined workouts
+        // Predefined workouts with calculated calories
         const predefinedWorkouts = [
             {
                 id: 1,
@@ -1095,7 +1142,7 @@
                 duration: 15,
                 difficulty: "Beginner",
                 equipment: ["Bodyweight"],
-                calories: 150,
+                calories: 150, // Will be recalculated based on user weight
                 muscleGroups: ["Full Body"],
                 exercises: [
                     { name: "Jumping Jacks", duration: 45, rest: 15 },
@@ -1112,7 +1159,7 @@
                 duration: 45,
                 difficulty: "Intermediate",
                 equipment: ["Dumbbells", "Bench"],
-                calories: 300,
+                calories: 300, // Will be recalculated based on user weight
                 muscleGroups: ["Upper Body"],
                 exercises: [
                     { name: "Dumbbell Bench Press", rest: 90, reps: "8-10", sets: 3, weight: "50-60 lbs" },
@@ -1128,7 +1175,7 @@
                 duration: 20,
                 difficulty: "Intermediate",
                 equipment: ["Bodyweight"],
-                calories: 100,
+                calories: 100, // Will be recalculated based on user weight
                 muscleGroups: ["Core/Abs"],
                 exercises: [
                     { name: "Plank", duration: 45, rest: 15, sets: 3 },
@@ -1139,7 +1186,7 @@
             }
         ];
 
-        // Get weight progression tips during rest (FIXED)
+        // Get weight progression tips during rest
         function getWeightProgressionTip(exerciseName, workoutType, currentSet, totalSets) {
             const weightExercises = ['Bench Press', 'Dumbbell Bench Press', 'Squats', 'Deadlifts', 
                                     'Overhead Press', 'Bent-over Rows', 'Bicep Curls', 'Leg Press'];
@@ -1171,8 +1218,29 @@
         function init() {
             workouts = predefinedWorkouts;
             loadData();
+            refreshWorkoutData(); // Refresh calories and weights based on current user data
             showTab('home');
             startTimerLoop();
+        }
+
+        // Refresh workout data when user measurements or weights change
+        function refreshWorkoutData() {
+            // Update calories for custom and AI workouts
+            customWorkouts.forEach(workout => {
+                if (workout.custom || workout.aiGenerated) {
+                    workout.calories = calculateCalories(workout.type, workout.duration, workout.difficulty);
+                }
+            });
+            
+            // Update calories for predefined workouts too
+            workouts.forEach(workout => {
+                workout.calories = calculateCalories(workout.type, workout.duration, workout.difficulty);
+            });
+            
+            // Update weights for AI workouts
+            updateAIWorkoutWeights();
+            
+            saveData();
         }
 
         // Sharing functions
@@ -1214,7 +1282,7 @@
                     throw new Error('Invalid workout data');
                 }
                 
-                // Create new workout with imported data
+                // Create new workout with imported data and recalculated calories
                 const newWorkout = {
                     id: Date.now(),
                     name: `${importData.name} (Shared)`,
@@ -1222,7 +1290,7 @@
                     duration: importData.duration || 30,
                     difficulty: importData.difficulty || 'Intermediate',
                     equipment: importData.equipment || ['Bodyweight'],
-                    calories: importData.calories || 200,
+                    calories: calculateCalories(importData.type || 'Strength Training', importData.duration || 30, importData.difficulty || 'Intermediate'),
                     exercises: importData.exercises,
                     muscleGroups: importData.muscleGroups || ['Full Body'],
                     custom: true,
@@ -1241,7 +1309,7 @@
         function copyToClipboard(text) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
-                    alert('✅ Share code copied to clipboard!');
+                    alert('Share code copied to clipboard!');
                 }).catch(() => {
                     fallbackCopyToClipboard(text);
                 });
@@ -1261,9 +1329,9 @@
             textArea.select();
             try {
                 document.execCommand('copy');
-                alert('✅ Share code copied to clipboard!');
+                alert('Share code copied to clipboard!');
             } catch (err) {
-                alert('⚠ Could not copy to clipboard. Please copy the code manually.');
+                alert('Could not copy to clipboard. Please copy the code manually.');
             }
             document.body.removeChild(textArea);
         }
@@ -1274,13 +1342,13 @@
             if (!workout) return;
 
             if (!workout.custom && !workout.aiGenerated) {
-                alert('⚠️ Only custom and AI-generated workouts can be shared.');
+                alert('Only custom and AI-generated workouts can be shared.');
                 return;
             }
 
             const shareCode = exportWorkout(workout);
             if (!shareCode) {
-                alert('⚠ Failed to generate share code.');
+                alert('Failed to generate share code.');
                 return;
             }
 
@@ -1291,7 +1359,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>🔗 Share Workout</h3>
+                        <h3>Share Workout</h3>
                         <button class="close-btn" onclick="closeModal('shareModal')">&times;</button>
                     </div>
                     
@@ -1321,7 +1389,7 @@
                     </div>
                     
                     <button class="btn btn-share" onclick="copyToClipboard('${shareCode}')">
-                        📋 Copy to Clipboard
+                        Copy to Clipboard
                     </button>
                 </div>
             `;
@@ -1337,7 +1405,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>📥 Import Workout</h3>
+                        <h3>Import Workout</h3>
                         <button class="close-btn" onclick="closeModal('importModal')">&times;</button>
                     </div>
                     
@@ -1355,7 +1423,7 @@
                         </div>
                         
                         <button type="submit" class="btn btn-success">
-                            📥 Import Workout
+                            Import Workout
                         </button>
                     </form>
                 </div>
@@ -1373,7 +1441,7 @@
             const shareCode = document.getElementById('share-code-input').value.trim();
             
             if (!shareCode) {
-                alert('⚠ Please enter a share code.');
+                alert('Please enter a share code.');
                 return;
             }
             
@@ -1381,9 +1449,9 @@
                 const importedWorkout = importWorkout(shareCode);
                 closeModal('importModal');
                 showHomeTab();
-                alert(`✅ Successfully imported "${importedWorkout.name}"!`);
+                alert(`Successfully imported "${importedWorkout.name}"!`);
             } catch (error) {
-                alert(`⚠ Import failed: ${error.message}`);
+                alert(`Import failed: ${error.message}`);
             }
         }
 
@@ -1515,6 +1583,7 @@
                 const savedWeights = localStorage.getItem('fitflow-weights');
                 const savedExerciseHistory = localStorage.getItem('fitflow-exercise-history');
                 const savedProgressiveOverload = localStorage.getItem('fitflow-progressive-overload');
+                const savedUserBody = localStorage.getItem('fitflow-user-body');
                 
                 if (savedHistory) workoutHistory = JSON.parse(savedHistory);
                 if (savedStats) userStats = JSON.parse(savedStats);
@@ -1522,6 +1591,7 @@
                 if (savedWeights) userWeights = JSON.parse(savedWeights);
                 if (savedExerciseHistory) exerciseHistory = JSON.parse(savedExerciseHistory);
                 if (savedProgressiveOverload) progressiveOverload = JSON.parse(savedProgressiveOverload);
+                if (savedUserBody) userBody = JSON.parse(savedUserBody);
             } catch (e) {
                 console.error('Error loading data:', e);
             }
@@ -1535,6 +1605,7 @@
                 localStorage.setItem('fitflow-weights', JSON.stringify(userWeights));
                 localStorage.setItem('fitflow-exercise-history', JSON.stringify(exerciseHistory));
                 localStorage.setItem('fitflow-progressive-overload', JSON.stringify(progressiveOverload));
+                localStorage.setItem('fitflow-user-body', JSON.stringify(userBody));
             } catch (e) {
                 console.error('Error saving data:', e);
             }
@@ -1547,7 +1618,7 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // FIXED: Timer loop with proper state management
+        // Timer loop with proper state management
         function startTimerLoop() {
             setInterval(() => {
                 if (isTimerRunning && workoutInProgress && !isResting) {
@@ -1670,7 +1741,7 @@
                                     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div style="flex: 1;">
-                                    <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">⚡ Quick Start</div>
+                                    <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Quick Start</div>
                                     <div style="font-weight: bold; font-size: 16px;">${quickStartWorkout.name}</div>
                                     <div style="font-size: 12px; opacity: 0.8; margin-top: 2px;">${quickStartWorkout.type} • ${quickStartWorkout.duration}min</div>
                                 </div>
@@ -1683,7 +1754,7 @@
                                                    border-radius: 6px; 
                                                    cursor: pointer;
                                                    font-size: 16px;">
-                                        🔄
+                                        ↻
                                     </button>
                                     <button onclick="startWorkout(${quickStartWorkout.id})" 
                                             style="background: white; 
@@ -1702,10 +1773,10 @@
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
                         <button class="btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="showAIWorkoutModal()">
-                            🤖 AI Workout
+                            AI Workout
                         </button>
                         <button class="btn" style="background: linear-gradient(135deg, #a855f7, #9333ea);" onclick="showCreateWorkoutModal()">
-                            📝 Custom
+                            Custom
                         </button>
                     </div>
 
@@ -1721,7 +1792,7 @@
                             </div>
                             <div class="workout-info">
                                 <div>🎯 ${workout.type}</div>
-                                <div>🕐 ${workout.duration}min</div>
+                                <div>🕒 ${workout.duration}min</div>
                                 <div>💪 ${workout.muscleGroups ? workout.muscleGroups[0] : 'Full Body'}</div>
                                 <div>🔥 ${workout.difficulty}</div>
                             </div>
@@ -1729,7 +1800,7 @@
                                 Equipment: ${Array.isArray(workout.equipment) ? workout.equipment[0] : workout.equipment} • ~${workout.calories} cal
                             </div>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})" style="flex: 1; min-width: 70px;">Details</button>
+                                <button class="btn btn-secondary" onclick="showWorkoutDetails(${workout.id})" style="flex: 1; min-width: 70px;">View</button>
                                 ${workout.custom || workout.aiGenerated ? `<button class="btn btn-warning" onclick="editWorkout(${workout.id})" style="flex: 1; min-width: 70px;">Edit</button>` : ''}
                                 ${workout.custom || workout.aiGenerated ? `<button class="btn btn-share" onclick="showShareModal(${workout.id})" style="flex: 1; min-width: 70px;">Share</button>` : ''}
                                 <button class="btn btn-success" onclick="startWorkout(${workout.id})" style="flex: 1; min-width: 70px;">Start</button>
@@ -1901,9 +1972,9 @@
                         <div class="exercise-description" style="background: #f9fafb; border: 2px solid #e5e7eb;">
                             <div style="display: flex; align-items: center; margin-bottom: 8px;">
                                 <span style="font-size: 20px; margin-right: 8px;">📖</span>
-                                <strong style="font-size: 16px;">How to perform:</strong>
+                                <strong style="font-size: 16px; color: #000000;">How to perform:</strong>
                             </div>
-                            <div style="line-height: 1.7;">
+                            <div style="line-height: 1.7; color: #000000;">
                                 ${instruction}
                             </div>
                         </div>
@@ -2006,6 +2077,32 @@
 
                     <div class="sharing-section">
                         <h3 style="margin-bottom: 12px; display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">📏</span> Body Measurements
+                        </h3>
+                        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 16px;">
+                            Enter your measurements for accurate calorie calculations
+                        </p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                            <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; backdrop-filter: blur(10px);">
+                                <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Weight</div>
+                                <div style="font-size: 20px; font-weight: bold;">
+                                    ${userBody.weight > 0 ? `${userBody.weight} lbs` : 'Not set'}
+                                </div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; backdrop-filter: blur(10px);">
+                                <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Height</div>
+                                <div style="font-size: 20px; font-weight: bold;">
+                                    ${userBody.height > 0 ? `${Math.floor(userBody.height/12)}'${userBody.height%12}"` : 'Not set'}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn" style="background: white; color: #06b6d4;" onclick="showBodyModal()">
+                            📏 Update Measurements
+                        </button>
+                    </div>
+
+                    <div class="sharing-section">
+                        <h3 style="margin-bottom: 12px; display: flex; align-items: center;">
                             <span style="margin-right: 8px;">🔗</span> Share & Import Workouts
                         </h3>
                         <p style="font-size: 14px; opacity: 0.9; margin-bottom: 16px;">
@@ -2080,7 +2177,7 @@
             `;
         }
 
-        // FIXED: Get recommended weight with proper percentage-based system
+        // Get recommended weight with proper percentage-based system
         function getRecommendedWeight(exerciseName, currentWeight, workoutType = 'Strength Training', difficulty = 'Intermediate') {
             if (currentWeight) return currentWeight;
             
@@ -2096,7 +2193,6 @@
             if (userWeights[exerciseName] && userWeights[exerciseName] > 0) {
                 matchedExercise = exerciseName;
                 maxWeight = userWeights[exerciseName];
-                console.log(`Exact match found: ${exerciseName} = ${maxWeight} lbs`);
             } else {
                 // Then try contains match, but be more specific
                 for (let weightEx of weightExercises) {
@@ -2106,7 +2202,6 @@
                             if (exerciseName.toLowerCase().includes(weightEx.toLowerCase().replace('dumbbell ', ''))) {
                                 matchedExercise = weightEx;
                                 maxWeight = userWeights[weightEx];
-                                console.log(`Dumbbell match found: ${exerciseName} matched to ${weightEx} = ${maxWeight} lbs`);
                                 break;
                             }
                         }
@@ -2115,7 +2210,6 @@
                             if (exerciseName.toLowerCase().includes(weightEx.toLowerCase())) {
                                 matchedExercise = weightEx;
                                 maxWeight = userWeights[weightEx];
-                                console.log(`Standard match found: ${exerciseName} matched to ${weightEx} = ${maxWeight} lbs`);
                                 break;
                             }
                         }
@@ -2124,11 +2218,8 @@
             }
             
             if (!matchedExercise || !maxWeight) {
-                console.log(`No weight match found for: ${exerciseName}`);
                 return null;
             }
-            
-            console.log(`Using ${matchedExercise}: ${maxWeight} lbs for ${exerciseName}`);
             
             // Apply progressive overload if enabled and exercise has history
             let originalWeight = maxWeight;
@@ -2139,7 +2230,6 @@
                 if (increases > 0) {
                     const multiplier = 1 + (progressiveOverload.percentage / 100 * increases);
                     maxWeight = Math.round(maxWeight * multiplier);
-                    console.log(`Progressive overload applied: ${originalWeight} * ${multiplier.toFixed(2)} = ${maxWeight} lbs`);
                 }
             }
             
@@ -2155,21 +2245,15 @@
             const percentage = phaseData.percentages[percentageIndex];
             let workingWeight = maxWeight * percentage;
             
-            console.log(`Weight calculation: ${maxWeight} (max) * ${percentage} (${phase}/${difficulty}) = ${workingWeight.toFixed(1)} lbs`);
-            
             // Round to nearest 2.5 lbs (covers both 2.5 and 5 lb increments)
             workingWeight = Math.round(workingWeight / 2.5) * 2.5;
-            
-            console.log(`Rounded working weight: ${workingWeight} lbs`);
             
             // Handle dumbbell exercises (per arm)
             const isDumbbell = exerciseName.includes('Dumbbell') || dumbbellExercises.some(ex => exerciseName.includes(ex));
             if (isDumbbell) {
-                console.log(`Dumbbell exercise detected: ${exerciseName} -> ${workingWeight} lbs per arm`);
                 return `${workingWeight} lbs per arm`;
             }
             
-            console.log(`Final recommendation: ${workingWeight} lbs`);
             return `${workingWeight} lbs`;
         }
 
@@ -2200,14 +2284,14 @@
             }, 100);
         }
 
-        // FIXED: Toggle timer function
+        // Toggle timer function
         function toggleTimer() {
             if (isResting) return; // Don't allow timer toggle during rest
             isTimerRunning = !isTimerRunning;
             showWorkoutTab(); // Refresh the UI to show the correct button state
         }
 
-        // FIXED: Complete exercise function
+        // Complete exercise function
         function completeExercise() {
             if (!currentWorkout || !currentWorkout.exercises || !workoutInProgress) {
                 console.error('No current workout or exercises found');
@@ -2324,18 +2408,18 @@
             
             // Show motivational message
             const messages = [
-                '🎉 Amazing work! You crushed that workout!',
-                '💪 Beast mode activated! Great job!',
-                '🔥 You\'re on fire! Keep up the momentum!',
-                '⭐ Workout complete! You\'re a champion!',
-                '🚀 Incredible effort! You\'re getting stronger!',
-                '🏆 Victory! Another workout in the books!'
+                'Amazing work! You crushed that workout!',
+                'Beast mode activated! Great job!',
+                'You\'re on fire! Keep up the momentum!',
+                'Workout complete! You\'re a champion!',
+                'Incredible effort! You\'re getting stronger!',
+                'Victory! Another workout in the books!'
             ];
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
             
             showTab('profile');
             setTimeout(() => {
-                alert(randomMessage + `\n\n⏱️ Time: ${formatTime(timer)}\n🔥 Streak: ${userStats.streak} day${userStats.streak > 1 ? 's' : ''}`);
+                alert(randomMessage + `\n\nTime: ${formatTime(timer)}\nStreak: ${userStats.streak} day${userStats.streak > 1 ? 's' : ''}`);
             }, 100);
         }
 
@@ -2371,7 +2455,7 @@
             if (!workout) return;
 
             if (!workout.custom && !workout.aiGenerated) {
-                alert('⚠️ You can only edit custom and AI-generated workouts.');
+                alert('You can only edit custom and AI-generated workouts.');
                 return;
             }
 
@@ -2382,11 +2466,6 @@
         function generateAIWorkout(preferences) {
             const exerciseCount = preferences.exerciseCount || Math.max(4, Math.min(8, Math.floor(preferences.duration / 5)));
             const exercises = [];
-            
-            // Calculate time per exercise
-            const timePerExercise = Math.floor(preferences.duration * 60 / exerciseCount);
-            const exerciseTime = Math.floor(timePerExercise * 0.7 / 15) * 15; // Round to 15 seconds
-            const restTime = Math.floor(timePerExercise * 0.3 / 15) * 15;
             
             // Get exercises based on muscle groups
             let primaryExercises = [];
@@ -2479,11 +2558,8 @@
                 exercises.push(exercise);
             });
 
-            const baseCalories = preferences.type === 'HIIT' || preferences.type === 'Cardio' ? 10 : 
-                              preferences.type === 'Strength Training' ? 8 : 5;
-            const calories = Math.floor(preferences.duration * baseCalories * 
-                           (preferences.difficulty === 'Advanced' ? 1.2 : 
-                            preferences.difficulty === 'Beginner' ? 0.8 : 1));
+            // Use the calorie calculator instead of hardcoded values
+            const calories = calculateCalories(preferences.type, preferences.duration, preferences.difficulty);
 
             const muscleGroupName = preferences.muscleGroups && preferences.muscleGroups.length > 0 ? 
                 preferences.muscleGroups[0] : 'Full Body';
@@ -2504,6 +2580,102 @@
         }
 
         // Modal functions
+        function showBodyModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'bodyModal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Body Measurements</h3>
+                        <button class="close-btn" onclick="closeModal('bodyModal')">&times;</button>
+                    </div>
+                    <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
+                        Your measurements are used to calculate accurate calorie burn estimates using the METS formula.
+                    </p>
+                    <form id="bodyForm">
+                        <div class="form-group">
+                            <label class="form-label">Weight (lbs)</label>
+                            <input type="number" 
+                                   id="body-weight" 
+                                   class="form-input" 
+                                   placeholder="Enter your weight in pounds"
+                                   value="${userBody.weight || ''}"
+                                   min="50" max="500" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Height (feet & inches)</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <input type="number" 
+                                       id="body-height-feet" 
+                                       class="form-input" 
+                                       placeholder="Feet"
+                                       value="${userBody.height > 0 ? Math.floor(userBody.height/12) : ''}"
+                                       min="3" max="8">
+                                <input type="number" 
+                                       id="body-height-inches" 
+                                       class="form-input" 
+                                       placeholder="Inches"
+                                       value="${userBody.height > 0 ? userBody.height%12 : ''}"
+                                       min="0" max="11">
+                            </div>
+                        </div>
+                        <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 12px; padding: 16px; margin: 16px 0;">
+                            <h4 style="color: #0c4a6e; margin-bottom: 8px;">Calorie Formula:</h4>
+                            <p style="color: #075985; font-size: 14px; margin: 0;">
+                                <strong>Calories = Duration × METS × 3.5 × Weight(kg) ÷ 200</strong><br>
+                                METS values vary by workout type (e.g., HIIT: 10, Strength: 5, Yoga: 3)
+                            </p>
+                        </div>
+                        <button type="submit" class="btn">Save Measurements</button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('bodyForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleBodyUpdate();
+            });
+        }
+
+        function handleBodyUpdate() {
+            const weight = parseInt(document.getElementById('body-weight').value);
+            const feet = parseInt(document.getElementById('body-height-feet').value) || 0;
+            const inches = parseInt(document.getElementById('body-height-inches').value) || 0;
+            
+            if (weight && weight > 0) {
+                userBody.weight = weight;
+                userBody.height = (feet * 12) + inches;
+                
+                // Recalculate calories for all workouts
+                refreshWorkoutData();
+                
+                saveData();
+                closeModal('bodyModal');
+                showProfileTab();
+                alert('Measurements updated! Workout calories have been recalculated.');
+            } else {
+                alert('Please enter a valid weight.');
+            }
+        }
+
+        function updateAIWorkoutWeights() {
+            // Update weights for all AI-generated workouts when user max weights change
+            customWorkouts.forEach(workout => {
+                if (workout.aiGenerated) {
+                    workout.exercises.forEach(exercise => {
+                        const recommendedWeight = getRecommendedWeight(exercise.name, null, workout.type, workout.difficulty);
+                        if (recommendedWeight) {
+                            exercise.weight = recommendedWeight;
+                        }
+                    });
+                }
+            });
+        }
+
         function showProgressiveOverloadModal() {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -2512,7 +2684,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>📈 Progressive Overload Settings</h3>
+                        <h3>Progressive Overload Settings</h3>
                         <button class="close-btn" onclick="closeModal('progressiveModal')">&times;</button>
                     </div>
                     <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
@@ -2542,7 +2714,7 @@
                                 <option value="4" ${progressiveOverload.weeks === 4 ? 'selected' : ''}>Every 4 weeks</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-success">💾 Save Settings</button>
+                        <button type="submit" class="btn btn-success">Save Settings</button>
                     </form>
                 </div>
             `;
@@ -2565,7 +2737,7 @@
             saveData();
             closeModal('progressiveModal');
             showProfileTab();
-            alert('✅ Progressive overload settings updated!');
+            alert('Progressive overload settings updated!');
         }
 
         function showWeightModal() {
@@ -2587,7 +2759,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>📊 Update Max Weights</h3>
+                        <h3>Update Max Weights</h3>
                         <button class="close-btn" onclick="closeModal('weightModal')">&times;</button>
                     </div>
                     <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">
@@ -2606,14 +2778,14 @@
                             </div>
                         `).join('')}
                         <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 12px; padding: 16px; margin: 16px 0;">
-                            <h4 style="color: #0c4a6e; margin-bottom: 8px;">💡 How AI Uses Your Weights:</h4>
+                            <h4 style="color: #0c4a6e; margin-bottom: 8px;">How AI Uses Your Weights:</h4>
                             <ul style="color: #075985; font-size: 14px; margin: 0; padding-left: 20px;">
                                 <li><strong>Strength:</strong> 75-85% of 1RM (4-5 sets of 4-6 reps)</li>
                                 <li><strong>Hypertrophy:</strong> 65-75% of 1RM (4-6 sets of 8-10 reps)</li>
                                 <li><strong>Power:</strong> 85-95% of 1RM (3-5 sets of 2-4 reps)</li>
                             </ul>
                         </div>
-                        <button type="submit" class="btn">💾 Save Weights</button>
+                        <button type="submit" class="btn">Save Weights</button>
                     </form>
                 </div>
             `;
@@ -2639,10 +2811,13 @@
                 }
             });
             
+            // Update AI workout weights when max weights change
+            updateAIWorkoutWeights();
+            
             saveData();
             closeModal('weightModal');
             showProfileTab();
-            alert('✅ Weights updated successfully!');
+            alert('Weights updated! AI workout weights have been automatically adjusted.');
         }
 
         function showAIWorkoutModal() {
@@ -2652,7 +2827,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>🤖 AI Workout Generator</h3>
+                        <h3>AI Workout Generator</h3>
                         <button class="close-btn" onclick="closeModal('aiModal')">&times;</button>
                     </div>
                     <form id="aiWorkoutForm">
@@ -2703,7 +2878,7 @@
                             </div>
                         </div>
                         <button type="submit" class="btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
-                            🤖 Generate AI Workout
+                            Generate AI Workout
                         </button>
                     </form>
                 </div>
@@ -2724,7 +2899,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>📝 Create Custom Workout</h3>
+                        <h3>Create Custom Workout</h3>
                         <button class="close-btn" onclick="closeModal('createModal')">&times;</button>
                     </div>
                     <form id="createWorkoutForm">
@@ -2748,15 +2923,12 @@
                                 </select>
                             </div>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <div class="form-group">
-                                <label class="form-label">Duration (min)</label>
-                                <input type="number" id="workout-duration" class="form-input" min="1" value="30" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Est. Calories</label>
-                                <input type="number" id="workout-calories" class="form-input" min="1" value="200" required>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Duration (min)</label>
+                            <input type="number" id="workout-duration" class="form-input" min="1" value="30" required>
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                                Calories will be calculated automatically based on workout type, duration, and your body weight
+                            </p>
                         </div>
                         
                         <div class="form-group">
@@ -2794,7 +2966,7 @@
                         </div>
                         
                         <button type="submit" class="btn" style="background: linear-gradient(135deg, #a855f7, #9333ea);">
-                            📝 Create Workout
+                            Create Workout
                         </button>
                     </form>
                 </div>
@@ -2853,7 +3025,7 @@
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>✏️ Edit Workout</h3>
+                        <h3>Edit Workout</h3>
                         <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
                     </div>
                     <form id="editWorkoutForm" data-workout-id="${workout.id}">
@@ -2923,7 +3095,7 @@
                             </button>
                         </div>
                         
-                        <button type="submit" class="btn btn-warning">💾 Save Changes</button>
+                        <button type="submit" class="btn btn-warning">Save Changes</button>
                     </form>
                 </div>
             `;
@@ -3027,7 +3199,7 @@
                             <span style="font-size: 12px;">Level</span>
                         </div>
                         <div class="detail-card">
-                            <strong>${workout.calories}</strong><br>
+                            <strong>~${workout.calories}</strong><br>
                             <span style="font-size: 12px;">Calories</span>
                         </div>
                     </div>
@@ -3083,7 +3255,7 @@
             saveData();
             closeModal('aiModal');
             showHomeTab();
-            alert('🎉 AI Workout Generated!');
+            alert('AI Workout Generated!');
         }
 
         function handleCreateWorkout() {
@@ -3108,7 +3280,11 @@
                 type: document.getElementById('workout-type').value,
                 difficulty: document.getElementById('workout-difficulty').value,
                 duration: parseInt(document.getElementById('workout-duration').value),
-                calories: parseInt(document.getElementById('workout-calories').value),
+                calories: calculateCalories(
+                    document.getElementById('workout-type').value,
+                    parseInt(document.getElementById('workout-duration').value),
+                    document.getElementById('workout-difficulty').value
+                ),
                 equipment: ['Bodyweight'],
                 exercises: exercises,
                 custom: true,
@@ -3119,7 +3295,7 @@
             saveData();
             closeModal('createModal');
             showHomeTab();
-            alert('✅ Custom Workout Created!');
+            alert('Custom Workout Created!');
         }
 
         function handleEditWorkout() {
@@ -3143,15 +3319,34 @@
             
             const workoutIndex = customWorkouts.findIndex(w => w.id === workoutId);
             if (workoutIndex !== -1) {
+                const newType = document.getElementById('edit-workout-type').value;
+                const newDifficulty = document.getElementById('edit-workout-difficulty').value;
+                const newDuration = customWorkouts[workoutIndex].duration; // Keep existing duration for now
+                
                 customWorkouts[workoutIndex].name = document.getElementById('edit-workout-name').value;
-                customWorkouts[workoutIndex].type = document.getElementById('edit-workout-type').value;
-                customWorkouts[workoutIndex].difficulty = document.getElementById('edit-workout-difficulty').value;
+                customWorkouts[workoutIndex].type = newType;
+                customWorkouts[workoutIndex].difficulty = newDifficulty;
                 customWorkouts[workoutIndex].exercises = exercises;
+                
+                // Recalculate calories if workout was custom or AI generated
+                if (customWorkouts[workoutIndex].custom || customWorkouts[workoutIndex].aiGenerated) {
+                    customWorkouts[workoutIndex].calories = calculateCalories(newType, newDuration, newDifficulty);
+                }
+                
+                // Update weights for AI workouts if they have weight exercises
+                if (customWorkouts[workoutIndex].aiGenerated) {
+                    exercises.forEach(exercise => {
+                        const recommendedWeight = getRecommendedWeight(exercise.name, null, newType, newDifficulty);
+                        if (recommendedWeight && !exercise.weight) {
+                            exercise.weight = recommendedWeight;
+                        }
+                    });
+                }
                 
                 saveData();
                 closeModal('editModal');
                 showHomeTab();
-                alert('✅ Workout updated!');
+                alert('Workout updated!');
             }
         }
 
